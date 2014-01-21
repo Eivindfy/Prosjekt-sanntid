@@ -2,4 +2,4 @@ Prosjekt-sanntid
 ================
 
 
-ballar
+ballor

@@ -1,2 +1,2 @@
-netverkeksempel1 er for oppgave 1 øving 3
+netverkeksempel1 er for oppgave 1 øving 3 \n
 netverkeksempel2 er for oppgave 2 øving 3

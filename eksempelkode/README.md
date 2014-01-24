@@ -8,3 +8,5 @@ netverkeksempel2 er for oppgave 2 øving 3
 
 kaisuperreceiver1.c er ein receiver som tar ein melding på 1024 teikn fra tcp-serveren
 følg guide: http://csperkins.org/teaching/ns3/labs-intro.pdf
+
+kaisuperreceivertransmitter sender tilbake i tillegg til å hente fra serveren, men berre ein gang så langt

@@ -85,8 +85,13 @@ int main(){
 
 	char* message = "Connect to: 129.241.187.150:20000\0";
 	send(socketfd,message,strlen(message)+1,0);
+	
+	int yes = 1;
 
-
+	if(setsocketopt(socket2fd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(*local_addr)=-1){
+		printf("Error setting socket as readable: %i", errno);
+		return -1;
+	}
 
 	if(bind(socket2fd, (struct sockaddr* ) local_addr, sizeof(*local_addr))==-1){
 		printf("error binding socket: %i",errno);
@@ -121,7 +126,7 @@ int main(){
 	recv(new_sock, buf, sizeof(buf), 0);
         printf("%s\n", buf);
 	
-	shutdown(socket2fd,2);		
+
 
 	return 0;
 }

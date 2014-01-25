@@ -76,7 +76,7 @@ int main(){
 	// *Ordne instillingene  -  setsocketopt()
 	// *Binde  -  bind()
 	// *Lytte  -  listen()
-	// *aksepterr  -  accept()
+	// *Aksepter  -  accept()
 	// *Sende og motta meldinger  -  send() og recv()
 	
 	

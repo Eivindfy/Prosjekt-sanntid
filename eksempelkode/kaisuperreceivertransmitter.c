@@ -36,8 +36,9 @@ if (-1 == connect(fd, (struct sockaddr *)&address, sizeof(address)))
     }
 
 char buffer[1024];
+char ballorstring[1024]="ballor";
 int numberofchar=1;
-
+printf("Type \"ballor\" to exit\n")
 while(1){
 numberofchar=read(fd,buffer,1024);
 
@@ -50,12 +51,16 @@ printf("\n");
 printf("YOU SAY: \n");
 fgets(buffer,1024,stdin);
 printf("\n");
+if(strcmp(ballorstring,buffer)==0){
+    close(fd);
+    return 0;
+}
+}
 
 write(fd,buffer,1024);
 
 }
 
 
-close(fd);
 return 0;
 }

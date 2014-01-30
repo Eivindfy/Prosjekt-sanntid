@@ -51,7 +51,7 @@ printf("\n");
 printf("YOU SAY: \n");
 fgets(buffer,1024,stdin);
 printf("\n");
-if(strcmp(ballorstring,buffer)==0){
+if(strncmp(ballorstring,buffer)==0){
     close(fd);
     return 0;
 }

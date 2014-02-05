@@ -2,6 +2,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -9,17 +10,54 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <pthread.h>
 
 #define PORT 33546
 #define HOST "129.241.187.161"
 #define MY_IP "129.241.187.150"
 #define MY_PORT 20000
-#define NUMBER_OF_CONNECTION 10
+#define NUMBER_OF_CONNECTIONS 10
 
 
+struct socket_pack{
+	int intern_com;
+	int extern_com;
+}
 
-int main(){
+void *server_client_comunication(void *spvoid){
+	char message[1024];
+	struct socket_pack *sp = (struct socket_pack *) spvoid; 
+	fd_set communicationfd_set;
+	int fdmax;
+	struct timeval timeout;
+	timeout.tv_sec = 3*60;
+	timeout.tv_usec = 0;
+	FD_ZERO(&communicationfd_set);
+	FD_SET(sp->intern_com, &communicationfd_set);
+	FD_SET(sp->extern_com, &communicationfd_set);
+	fdmax= max(sp->intern_com, sp->extern_com);
+	while(true){
+		if(select(3, &communicationfd_set, 0, 0, timeout) <= 0 ){
+			printf("Error in select in server_client_comunication");
+			return -1;
+		}
+		for(int i = 0; i <= fdmax; i++){
+			if(FD_ISSET(i, &communicationfd_set)){
+					if(i == sp->intern_com){
+						recv(sp->intern_com, message, sizeof(message),0);
+						send(sp->extern_com, message, sizeof(message),0);
+					}
+					else if(i == sp->extern_com){
+						recv(sp->extern_com, message, sizeof(message),0);
+						send(sp->intern_com, message, sizeof(message),0);
+					}
+			}		
+		}
+	}
+} 
 
+void *servermodule(void *module_sockfdvoid){
+	int module_sockfd = (int) module_sockfdvoid;
 
 
 	// Kode for å la andre koble til denne maskinen
@@ -33,11 +71,15 @@ int main(){
 	
 	
 	// Lager master og midlertidig file desctriptor list samt timeout
-	fd_set = masterfd_set;
-	fd_set = readfd_set;
+	fd_set  masterfd_set;
+	fd_set  readfd_set;
 	struct timeval timeout;
 	int fdmax;
-
+	int intern_comunication_sockets[NUMBER_OF_CONNECTIONS];
+	for( int i = 0; i < NUMBER_OF_CONNECTIONS; i++){
+		intern_comunication_sockets[i] = 0;
+	}
+	char buffer[1024];
 
 	// Lager socket og initialiserer og setter verdier til sockaddr_in
 	struct sockaddr_in *server_addr;
@@ -52,28 +94,20 @@ int main(){
        return -1;
   }
 
-//struct in_addr server_in_addr;
-
-//if(inet_pton(AF_INET, MY_IP,&server_in_addr) <=0){
-//     printf("error");
-//     return -1;
-//}
-
-
   server_addr->sin_port = htons(MY_PORT);
   server_addr->sin_addr.s_addr = INADDR_ANY;
   server_addr->sin_family = AF_INET;
 
 	//setter master fd til 0 og timeout til 3 minutter 
 	FD_ZERO(&masterfd_set);
-	FS_ZERO(&tempfd_set);
+	FD_ZERO(&readfd_set);
 	fdmax = serverfd;
 	timeout.tv_sec = 3*60;
 	timeout.tv_usec = 0;
 	
 	// Forandrer på instillingene slik at socketen/porten er gjenbrukbar 
 	int yes = 1; // Denne er 1 fordi vi skal slå på SO_REUSEADDR
-	if(setsocketopt(serverfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(*server_addr)=-1){
+	if(setsocketopt(serverfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(*server_addr))=-1){
 		printf("Error setting socket as readable: %i", errno);
 		return -1;
 	}
@@ -88,6 +122,7 @@ int main(){
 	listen(serverfd,NUMBER_OF_CONNECTIONS);
 	
 	FD_SET(serverfd, &masterfd_set);
+	FD_SET(module_sockfd);
 
 
 	while(true){
@@ -100,42 +135,34 @@ int main(){
 			if (FD_ISSET( i, &readfd)){
 				if(i == serverfd) {
 					newfd =  accept(serverfd, NULL, 0);
-					SPAWN NEW THREAD FOR Å HÅDTERE TILKOBLINGENE	
+					int pair_of_sock[2],
+					socketpair(AF_UNIX, SOCK_STREAM, 0, pair_of_sock[2]);  
+					struct socket_pack *sp;
+					sp->intern_com = pair_of_sock[0];
+					sp->extern_com = newfd;
+					for(int j = 0; j < NUMBER_OF_CONECTIONS; j++){
+						if(intern_comunication_sockets[j] == 0)
+							intern_comunication_sockets[j] = pair_of_sock[1];
+					}
+					FD_SET(pair_of_sock[1], &readfd_set);
+					pthread_t thread;
+					if(pthread_create(&thread, NULL, server_client_comunication , (void *) sp) == -1){
+						printf("Error creating pthread.");
+						return -1;
+					}	
+				}
+				for( int j = 0; j < NUMBER_OF_CONECTIONS; j++){
+					if( i == intern_comunication_sockets[j]){
+						recv(i,buffer,sizeof(buffer),0);
+						send(module_sockfd,buffer,sizeof(buffer),0);
+					}
+				}
+				if(i == module_sockfd){
+					recv(i, buffer, sizeof(buffer), 0);
+
+					send
 				}
 			}
 		}
-						
-			
-			
 	}
-
-
-
-
-
-
-	int new_sock;
-
-	socklen_t addr_size = sizeof local_addr;
-	// Aksepterer inkommende henvendelse 
-	new_sock=accept(socket2fd, (struct sockaddr* )local_addr, &addr_size);
-	if(new_sock ==-1){
-		printf("error");
-		return -1;
-	}
-	
-	// Mottar velkomstmelding
-	recv(new_sock, buf, sizeof(buf), 0);
-	printf("%s\n", buf);
-	
-	//Sender melding 
-	message = "Hei ny melding!";	
-	send(new_sock,message,strlen(message)+1,0);
-
-	// Mottar svar
-	recv(new_sock, buf, sizeof(buf), 0);
-        printf("%s\n", buf);
-	
-
-	return 0;
 }

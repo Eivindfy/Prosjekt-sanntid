@@ -8,8 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PORT 34933
-#define ADDRESS "129.241.187.161"
+#define PORT 50000
+#define ADDRESS "127.0.0.1"
 
 
 
@@ -37,15 +37,20 @@ if (-1 == connect(fd, (struct sockaddr *)&address, sizeof(address)))
 
 char buffer[1024];
 char ballorstring[1024]="ballor";
-int numberofchar=1;
-printf("Type \"ballor\" to exit\n")
+printf("Type \"ballor\" to exit\n");
+
+read(fd,buffer,sizeof(buffer));
+printf("SERVER SAYS: \n"); 
+printf("%s",buffer);
+printf("\n");
+	 
+
 while(1){
-numberofchar=read(fd,buffer,1024);
+read(fd,buffer,sizeof(buffer));
 
 printf("SERVER SAYS: \n");
-for (int i=0;i < numberofchar; i++){
-printf("%c",buffer[i]);
-}
+
+printf("%s",buffer);
 printf("\n");
 
 printf("YOU SAY: \n");
@@ -55,11 +60,11 @@ if(strncmp(ballorstring,buffer,6)==0){
     close(fd);
     return 0;
 }
+
+
+write(fd,buffer,sizeof(buffer));
 }
 
-write(fd,buffer,1024);
-
-}
 
 
 return 0;

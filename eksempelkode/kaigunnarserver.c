@@ -28,17 +28,18 @@ socklen_t addr_size = sizeof address;
 
 ny_sock = accept(fd, (struct sockaddr *)&address, &addr_size);
 char buffer[1024];
-char* message;
+char* message="hallo velkommen 3==D";
+send(ny_sock,message,strlen(message)+1,0);
 //recv(ny_sock, buffer, sizeof(buffer), 0);
 //printf("%s\n", buffer);
-
-message = "Server says hello";
-send(ny_sock, message, strlen(message)+1, 0);
+while(1){
+printf("Skriv inn ka du skal seie: \n");
+fgets(buffer,1024,stdin);
+send(ny_sock, buffer, sizeof(buffer), 0);
 
 recv(ny_sock, buffer, sizeof(buffer),0);
-printf("%s\n", buffer);
+printf("Klienten sier: \n%s\n", buffer);
 
+}
 return 0;
-
-
 }

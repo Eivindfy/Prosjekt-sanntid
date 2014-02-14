@@ -1,9 +1,14 @@
+#define _POSIX_C_SOURCE	199309
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <sys/time.h>
+#include <time.h>
+#include <errno.h>
+#include <unistd.h>
 
 // erstatt desse her med ei headerfil med  definisjonar eller noko
 #define UDPADDRESS "129.241.187.255"
@@ -15,10 +20,12 @@
 
 
 int main(){
+
 struct sockaddr_in from_udp_socket_address;
-struct sockaddr_storage remote_address;
 int udp_socketfd=socket(AF_INET,SOCK_DGRAM,0);
 char buffer[BUFFERLENGTH];
+int so_broadcast = 1;
+setsockopt(udp_socketfd, SOL_SOCKET, SO_BROADCAST, &so_broadcast, sizeof(so_broadcast));
 
 
 struct in_addr from_udp_address;
@@ -27,26 +34,36 @@ if(inet_pton(AF_INET,UDPADDRESS,&from_udp_address)<=0){
 	return -1;
 }
 
+
+
 from_udp_socket_address.sin_port = htons(UDPPORT);
 from_udp_socket_address.sin_addr = from_udp_address;
 from_udp_socket_address.sin_family = AF_INET;
 
+
+
 socklen_t udp_address_length = sizeof(from_udp_socket_address);
 
-bind(udp_socketfd, (struct sockaddr *)&from_udp_socket_address, sizeof(from_udp_socket_address)); 
 
 int transferstatus=-1;
+int i = 0;
 while(1){
 	printf("g\n");
-	transferstatus = recvfrom(udp_socketfd,buffer,BUFFERLENGTH, 0, (struct sockaddr*)&remote_address,&udp_address_length);
+	char* message = "Hei\n";
+	strcpy(buffer,message); 
+transferstatus = sendto(udp_socketfd,buffer,BUFFERLENGTH, 0, (struct sockaddr*)&from_udp_socket_address,udp_address_length);
 	if(transferstatus<0){
-		printf("error receiving from UDP in udpclient\n");
+		printf("error receiving from UDP in udpclient %s \n", strerror(errno));
 			return -1;
 	}
-	else{
-				printf("%s\n",buffer);
+    
 
-	}
+	
+    usleep(1000000);
+
+	i++;
+	if( i == 100000)
+		break;
 }
 return 0;
 }

@@ -21,7 +21,7 @@ int main(){
 	char buffer[1024];
 	char *tempmsg;
 
-	socketfd = socket(AF_INET, SOCK_STREAM,0);
+	socketfd = socket(AF_INET, SOCK_DGRAM,0);
 	if(socketfd== -1){
 		printf("error opening socket");
 		return -1;
@@ -45,7 +45,7 @@ int main(){
 		return -1;
 	}
 
-	n = recvfrom(socketfd, buffer, 1024, 0, server_addr, &addrlen);
+	n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
 	if(n<0){
 	    printf("error in recvfrom");
 	    return -1;

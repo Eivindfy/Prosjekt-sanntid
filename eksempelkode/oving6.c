@@ -5,13 +5,14 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <errno.h>
 
 #define HOST "127.0.0.1"
 #define PORT 20000
 
 int main (){
-	printf("hei");
-	
+	printf("hei\n");
 	struct sockaddr_in *server_addr;
 	struct sockaddr_in temp;
 	server_addr = &temp;
@@ -21,7 +22,7 @@ int main (){
 	struct timeval tv;
 	int tall = 0;
 	
-	socketfd = socket(AF_INET, SOCK_STREAM,0);
+	socketfd = socket(AF_INET, SOCK_DGRAM,0);
 	if(socketfd== -1){
 		printf("error opening socket");
 		return -1;
@@ -35,13 +36,24 @@ int main (){
 	server_addr->sin_port = htons(PORT);
 	server_addr->sin_addr = host_addr; 
 	server_addr->sin_family = AF_INET;
-
+	int yes = 1;
+	
+	if(setsockopt(socketfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(*server_addr)) ==-1){
+		printf("Error setting socket as readable: %i", errno);
+		return -1;
+	}
+	
+	if(bind(socketfd, (struct sockaddr *) server_addr, sizeof(*server_addr)) <= 0){
+		printf("Error in bind \n");
+		return -1;
+	}
+	
 	FD_ZERO(&udpset);
 	FD_SET(socketfd, &udpset);
 
 	tv.tv_sec = 0;
 	tv.tv_usec = 50000;
-	socklen_t addrlen = sizeof(server_addr);
+	socklen_t addrlen = sizeof(*server_addr);
 	select(2, &udpset, NULL, NULL, &tv);
 	if (FD_ISSET(socketfd,  &udpset)){
 		n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
@@ -60,12 +72,13 @@ int main (){
 			}
 			int miss_count = 0;
 			while(1) {
-				n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
-				if(n<0){
-					printf("error in recvfrom");
-					return -1;
-				}
+				select(2, &udpset, NULL, NULL, &tv);
 				if(FD_ISSET(socketfd, &udpset) && !strcmp(buffer,"2")){
+					n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
+					if(n<0){
+						printf("error in recvfrom");
+						return -1;
+					}
 					miss_count = 0;
 				}
 				else{
@@ -77,27 +90,31 @@ int main (){
 			}
 		}
 	}
-	system("test");
+	system("./test");
 	strcpy(buffer,"2");
 	for( int i = 0; i <10 ;i++){
-		n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, addrlen);
+		n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *) server_addr, addrlen);
 		if (n < 0){
-  	  printf("error in sendto");
+			printf("error in sendto. %s \n", strerror(errno));
     	return -1;
 		}
 	}
-	select(2, &udpset, NULL, NULL, &tv);
-	n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
-	if(n<0){
-		printf("error in recvfrom");
-		return -1;
-	}	
-	if(FD_ISSET(socketfd,&udpset) && strcmp(buffer,"2")){
-	  printf("Master initiated!\n");
-	}
-	else{
-		printf("No backup detected. \n");
-		return 0;
+	usleep(5000000);
+	for(int i = 0;	i < 20; i++){
+		select(2, &udpset, NULL, NULL, &tv);
+		n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
+		printf("%s \n",buffer);
+		if(n<0){
+			printf("error in recvfrom");
+			return -1;
+		}	
+		if(FD_ISSET(socketfd,&udpset) && strcmp(buffer,"1")){
+			printf("Master initiated!\n");
+			break;
+		}
+		else{
+			printf("No backup detected. \n");
+		}
 	}
 	FILE *fr = fopen("/tmp/test.txt", "r");
 	if (fr != NULL){
@@ -126,6 +143,7 @@ int main (){
 			printf("error in sendto");
 			return -1;
 		}
+		usleep(5000000);
 	}
 
 		
@@ -134,3 +152,4 @@ int main (){
 
 	return 0;
 }
+

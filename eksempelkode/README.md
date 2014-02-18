@@ -10,3 +10,6 @@ kaisuperreceiver1.c er ein receiver som tar ein melding på 1024 teikn fra tcp-s
 følg guide: http://csperkins.org/teaching/ns3/labs-intro.pdf
 
 kaisuperreceivertransmitter sender tilbake i tillegg til å hente fra serveren, men berre ein gang så langt
+
+
+På receive treng ein å bruke bind() både på tcp og udp. På send  treng ein ikkje. bind gjer at porten er åpen og sånn der.

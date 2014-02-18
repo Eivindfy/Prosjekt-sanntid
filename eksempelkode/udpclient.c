@@ -14,6 +14,10 @@
 //
 
 
+
+// denne og udpclient2 virker
+
+
 int main(){
 struct sockaddr_in from_udp_socket_address;
 struct sockaddr_storage remote_address;

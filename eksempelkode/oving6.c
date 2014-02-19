@@ -2,14 +2,15 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <sys/select.h>
 #include <sys/time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
 
-#define HOST "127.0.0.1"
-#define PORT 20000
+#define HOST "129.241.187.143"
+#define PORT 25000
 
 int main (){
 	printf("hei\n");
@@ -42,26 +43,31 @@ int main (){
 		printf("Error setting socket as readable: %i", errno);
 		return -1;
 	}
-	
-	if(bind(socketfd, (struct sockaddr *) server_addr, sizeof(*server_addr)) <= 0){
-		printf("Error in bind \n");
+
+	if(bind(socketfd, (struct sockaddr *) server_addr, sizeof(*server_addr)) < 0){
+		printf("Error in bind. %s \n", strerror(errno));
 		return -1;
 	}
 	
 	FD_ZERO(&udpset);
 	FD_SET(socketfd, &udpset);
 
-	tv.tv_sec = 0;
-	tv.tv_usec = 50000;
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
 	socklen_t addrlen = sizeof(*server_addr);
-	select(2, &udpset, NULL, NULL, &tv);
+	if (select(2, &udpset, NULL, NULL, &tv) < 0){
+        printf("Error in select. %s \n ", strerror(errno));
+        return -1;
+    }
 	if (FD_ISSET(socketfd,  &udpset)){
+        printf("backup \n");
 		n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
 		if(n<0){
 		  printf("error in recvfrom");
 		  return -1;
 		}
-		if (!strcmp(buffer,"2")){
+        printf("%s \n",buffer);
+		if (strcmp(buffer,"2")){
 			strcpy(buffer,"1");
 			for( int i = 0; i < 10 ; i++){
 				n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, addrlen);
@@ -90,17 +96,20 @@ int main (){
 			}
 		}
 	}
-	system("./test");
+	system("mate-terminal -e ./test");
 	strcpy(buffer,"2");
+    usleep(100000);
 	for( int i = 0; i <10 ;i++){
 		n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *) server_addr, addrlen);
+        printf("sending \n");
 		if (n < 0){
 			printf("error in sendto. %s \n", strerror(errno));
     	return -1;
 		}
 	}
-	usleep(5000000);
-	for(int i = 0;	i < 20; i++){
+    
+	usleep(1000000);
+	for(int i = 0;	i < 10; i++){
 		select(2, &udpset, NULL, NULL, &tv);
 		n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
 		printf("%s \n",buffer);
@@ -115,7 +124,9 @@ int main (){
 		else{
 			printf("No backup detected. \n");
 		}
+        usleep(500000);
 	}
+    printf("her");
 	FILE *fr = fopen("/tmp/test.txt", "r");
 	if (fr != NULL){
 		char filebuff[16];
@@ -143,7 +154,7 @@ int main (){
 			printf("error in sendto");
 			return -1;
 		}
-		usleep(5000000);
+		usleep(500000);
 	}
 
 		

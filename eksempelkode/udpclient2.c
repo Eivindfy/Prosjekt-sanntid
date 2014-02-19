@@ -53,9 +53,9 @@ while(1){
 	printf("g\n");
 	char* message = "Hei\n";
 	strcpy(buffer,message); 
-transferstatus = sendto(udp_socketfd,buffer,BUFFERLENGTH, 0, (struct sockaddr*)&from_udp_socket_address,udp_address_length);
+	transferstatus = sendto(udp_socketfd,buffer,BUFFERLENGTH, 0, (struct sockaddr*)&from_udp_socket_address,udp_address_length);
 	if(transferstatus<0){
-		printf("error receiving from UDP in udpclient %s \n", strerror(errno));
+		printf("error sending to UDP in udpclient2 %s \n", strerror(errno));
 			return -1;
 	}
     

@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#define HOST "129.241.187.143"
+#define HOST "129.241.187.255"
 #define PORT 25000
 
 int main (){
@@ -39,26 +39,31 @@ int main (){
 	server_addr->sin_family = AF_INET;
 	int yes = 1;
 	
-	if(setsockopt(socketfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(*server_addr)) ==-1){
+	if(setsockopt(socketfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(yes)) ==-1){
 		printf("Error setting socket as readable: %i", errno);
 		return -1;
 	}
 
+
+	
 	if(bind(socketfd, (struct sockaddr *) server_addr, sizeof(*server_addr)) < 0){
 		printf("Error in bind. %s \n", strerror(errno));
 		return -1;
 	}
-	
+    
 	FD_ZERO(&udpset);
 	FD_SET(socketfd, &udpset);
 
-	tv.tv_sec = 1;
+	tv.tv_sec = 2;
 	tv.tv_usec = 0;
+    int ret;
 	socklen_t addrlen = sizeof(*server_addr);
-	if (select(2, &udpset, NULL, NULL, &tv) < 0){
+	if ((ret=select(socketfd+1, &udpset, NULL, NULL, &tv)) < 0){
         printf("Error in select. %s \n ", strerror(errno));
         return -1;
     }
+    int was_back=0;
+    printf("%d \n", socketfd);
 	if (FD_ISSET(socketfd,  &udpset)){
         printf("backup \n");
 		n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
@@ -67,25 +72,24 @@ int main (){
 		  return -1;
 		}
         printf("%s \n",buffer);
-		if (strcmp(buffer,"2")){
+		if (buffer[0] == '2'){
 			strcpy(buffer,"1");
-			for( int i = 0; i < 10 ; i++){
-				n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, addrlen);
-				if (n < 0){
-					printf("error in sendto");
-					return -1;
-				}
-			}
+            printf("%s \n",buffer);
+            usleep(100000);
 			int miss_count = 0;
 			while(1) {
-				select(2, &udpset, NULL, NULL, &tv);
-				if(FD_ISSET(socketfd, &udpset) && !strcmp(buffer,"2")){
+				ret = select(socketfd+1, &udpset, NULL, NULL, &tv);
+                printf("%d, %d\n",miss_count,ret);
+                was_back = 1;
+				if(FD_ISSET(socketfd, &udpset) ){
 					n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
 					if(n<0){
-						printf("error in recvfrom");
+						printf("error in recvfrom");//
 						return -1;
 					}
+                    usleep(500000);
 					miss_count = 0;
+                    printf("%s\n",buffer);
 				}
 				else{
 					miss_count ++;
@@ -96,9 +100,9 @@ int main (){
 			}
 		}
 	}
+    setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes));
 	system("mate-terminal -e ./test");
 	strcpy(buffer,"2");
-    usleep(100000);
 	for( int i = 0; i <10 ;i++){
 		n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *) server_addr, addrlen);
         printf("sending \n");
@@ -106,54 +110,40 @@ int main (){
 			printf("error in sendto. %s \n", strerror(errno));
     	return -1;
 		}
+        usleep(10000);
 	}
     
-	usleep(1000000);
-	for(int i = 0;	i < 10; i++){
-		select(2, &udpset, NULL, NULL, &tv);
-		n = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, &addrlen);
-		printf("%s \n",buffer);
-		if(n<0){
-			printf("error in recvfrom");
-			return -1;
-		}	
-		if(FD_ISSET(socketfd,&udpset) && strcmp(buffer,"1")){
-			printf("Master initiated!\n");
-			break;
-		}
-		else{
-			printf("No backup detected. \n");
-		}
-        usleep(500000);
-	}
-    printf("her");
-	FILE *fr = fopen("/tmp/test.txt", "r");
-	if (fr != NULL){
+    if(was_back)
+        return -1;
+	FILE * fr = fopen("/tmp/test.txt", "r");
+    
+	if (fr){
 		char filebuff[16];
 		fgets(filebuff, 16, (FILE*)fr); 
 		tall = atoi(filebuff);
+        fclose(fr);
 	}
 	else 
 		tall = 0;
-	fclose(fr);
+	printf("her\n");
 
 
-	FILE *fw = fopen("/tmp/test.txt", "w");
-	if (fw == NULL){
-		printf("Failed to open file for writing");
-		return -1;
-	}
+	
 
 	while(1){
-		char filebuff[16];
+        FILE *fw = fopen("/tmp/test.txt", "w");
+    	if (!fw){
+    		printf("Failed to open file for writing");
+    		return -1;
+    	}
 		printf("%i\n",tall++);
-		sprintf( filebuff, "%i", tall);
 		fprintf(fw, "%i", tall);
 		n = sendto(socketfd, buffer, 1024, 0, (struct sockaddr *)server_addr, addrlen);
 		if (n < 0){
 			printf("error in sendto");
 			return -1;
 		}
+        fclose(fw);
 		usleep(500000);
 	}
 

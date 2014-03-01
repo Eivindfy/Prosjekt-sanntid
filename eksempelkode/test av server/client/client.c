@@ -15,7 +15,7 @@
 #include <unistd.h>
 
 #define PORT 33546
-#define HOST "129.241.187.158"
+#define HOST "192.168.10.118"
 #define MY_IP "129.241.187.150"
 #define MY_PORT 20000
 #define NUMBER_OF_CONNECTIONS 10
@@ -29,9 +29,9 @@ struct socket_pack{
 void* server_client_comunication(void* spvoid){
 	sleep(1);
 	char message[BUFFER_SIZE];
-	printf("CLIENT: start pthread\n");
+//	printf("CLIENT: start pthread\n");
 	struct socket_pack *sp = (struct socket_pack *) spvoid; 
-	printf("CLIENT: socket pack created\n");
+//	printf("CLIENT: socket pack created\n");
 	fd_set communicationfd_set;
 	int fdmax;
 	int rc;
@@ -42,8 +42,10 @@ void* server_client_comunication(void* spvoid){
 	FD_SET(sp->intern_com, &communicationfd_set);
 	FD_SET(sp->extern_com, &communicationfd_set);
 	fdmax = sp->intern_com >= sp->extern_com ? sp->intern_com : sp->extern_com;
-	printf("CLIENT: pthread created: sp->interncom = %d, sp->extern_com = %d, fdmax = %d \n", sp->intern_com, sp->extern_com, fdmax);
+//	printf("CLIENT: pthread created: sp->interncom = %d, sp->extern_com = %d, fdmax = %d \n", sp->intern_com, sp->extern_com, fdmax);
 	while(1){
+		FD_SET(sp->intern_com, &communicationfd_set);
+	        FD_SET(sp->extern_com, &communicationfd_set);
 		if((rc=select(fdmax+1, &communicationfd_set, NULL, NULL, &timeout)) <= 0 ){
 			printf("Error in select in server_client_comunication");
 //			return -1;
@@ -51,15 +53,15 @@ void* server_client_comunication(void* spvoid){
 //		printf("CLIENT: select initiated %d\n", rc);
 		for(int i = 0; i <= fdmax+1; i++){
 			if(FD_ISSET(i, &communicationfd_set)){
-					printf("CLIENT: select initiated %d\n", i);
+//					printf("CLIENT: select initiated %d\n", i);
 
 					if(i == sp->intern_com){
-						printf("CLIENT: sending message\n");
+//						printf("CLIENT: sending message\n");
 						recv(sp->intern_com, message, sizeof(message),0);
 						send(sp->extern_com, message, sizeof(message),0);
 					}
 					else if(i == sp->extern_com){
-						printf("CLIENT: recieving message\n");
+//						printf("CLIENT: recieving message\n");
 						recv(sp->extern_com, message, sizeof(message),0);
 						send(sp->intern_com, message, sizeof(message),0);
 					}
@@ -115,7 +117,7 @@ int create_client(){
 	void* dynamic_void_pointer;
 	dynamic_void_pointer = (void*) dynamic_sp_pointer;
 	pthread_create(&channel, NULL, server_client_comunication, dynamic_void_pointer);
-	printf("CLIENT: initialised\n");
+//	printf("CLIENT: initialised\n");
 	sleep(1);
 	return socket_pair[1];
 }

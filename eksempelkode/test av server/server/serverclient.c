@@ -37,16 +37,20 @@ void* server_client_comunication(void* spvoid){
 	FD_SET(sp->intern_com, &communicationfd_set);
 	FD_SET(sp->extern_com, &communicationfd_set);
 	fdmax = sp->intern_com >= sp->extern_com ? sp->intern_com : sp->extern_com;
-	printf("SERVERCLIENT: pthread_created\n");
+//	printf("SERVERCLIENT: pthread_created\n");
 	while(1){
+		FD_SET(sp->intern_com, &communicationfd_set);
+	        FD_SET(sp->extern_com, &communicationfd_set);
 		if(select(fdmax+1, &communicationfd_set, NULL, NULL, &timeout) <= 0 ){
 			printf("Error in select in server_client_comunication");
 //			return -1;
 		}
-		//printf("SERVERCLIENT: message recieved in server_client_comunilation\n");
+//		printf("SERVERCLIENT: message recieved in server_client_comunilation\n");
 		for(int i = 0; i <= fdmax; i++){
 			if(FD_ISSET(i, &communicationfd_set)){
+//					printf("SERVERCLIENT: message recieved in server_client_comunilation\n");
 					if(i == sp->intern_com){
+//						printf("SERVERCLIENT: message sent\n");
 						recv(sp->intern_com, message, sizeof(message),0);
 						send(sp->extern_com, message, sizeof(message),0);
 					}
@@ -126,22 +130,29 @@ void *servermodule(void *module_sockfdvoid){
 	FD_SET(serverfd, &readfd_set);
 	FD_SET(module_sockfd, &readfd_set);
 	
-	printf("SERVERCLIENT: setup complete: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+//	printf("SERVERCLIENT: setup complete: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
 //	memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
 
 	while(1){
 //		memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
-		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+//		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+		FD_SET(module_sockfd, &readfd_set);
+		FD_SET(serverfd, &readfd_set);
+		for( int i = 0; i < sizeof(intern_comunication_sockets);i++){
+			if(intern_comunication_sockets[i] == 0)
+				break;
+			FD_SET(intern_comunication_sockets[i], &readfd_set);
+		}
 		if(select(fdmax+1, &readfd_set, NULL, NULL, &timeout)<=0){
 			printf("Error i select\n");
 //			return -1; 
 		}
-		printf("SERVERCLIENT: select initiated\n");
+//		printf("SERVERCLIENT: select initiated\n");
 		for (int i = 0; i <= fdmax; i++){
 			if (FD_ISSET( i, &readfd_set)){
-				printf("SERVERCLIENT: fd selected %d\n",i);
+//				printf("SERVERCLIENT: fd selected %d\n",i);
 				if(i == serverfd) {
-					printf("SERVERCLIENT: client conected\n");
+//					printf("SERVERCLIENT: client conected\n");
 					newfd =  accept(serverfd, NULL, 0);
 					int pair_of_sock[2];
 					socketpair(AF_UNIX, SOCK_STREAM, 0, pair_of_sock);  
@@ -150,7 +161,7 @@ void *servermodule(void *module_sockfdvoid){
 					sp = &temp;
 					sp->intern_com = pair_of_sock[0];
 					sp->extern_com = newfd;
-					printf("SERVERCLIENT: new socketfd %d\n", newfd);
+//					printf("SERVERCLIENT: new socketfd %d\n", newfd);
 					for(int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 						if(intern_comunication_sockets[j] == 0)
 							intern_comunication_sockets[j] = pair_of_sock[1];
@@ -167,18 +178,19 @@ void *servermodule(void *module_sockfdvoid){
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 					if( i == intern_comunication_sockets[j]){
 						recv(i,buffer,sizeof(buffer),0);
-						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
+//						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
 						send(module_sockfd,buffer,sizeof(buffer),0);
 						break;
 					}
 				}
 				if(i == module_sockfd){
-					printf("SERVERCLIENT: recieved message from server\n");
-					recv(i, buffer, sizeof(buffer), 0);
+//					printf("SERVERCLIENT: recieved message from server\n");
+					recv(module_sockfd, buffer, sizeof(buffer), 0);
 					int client_id;
 					for( int j =  0; j < 3; j++){
 						client_id = (buffer[BUFFER_SIZE-3+j]-'0') * pow(10,j);
 					}
+//					printf("SERVERCLIENT: sending message to fd: %d\n", intern_comunication_sockets[client_id]);
 					send(intern_comunication_sockets[client_id],buffer,sizeof(buffer),0);
 				}
 			}

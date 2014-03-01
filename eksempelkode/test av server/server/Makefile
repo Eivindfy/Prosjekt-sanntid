@@ -2,7 +2,7 @@
 CFLAGS = -std=c99 -g -Wall -O2 -I . -MMD
 
 # Linker flags go here.
-LDFLAGS = -lpthread -lcomedi -g -lm
+LDFLAGS = -lpthread -g -lm
 
 # list of sources
 ELEVSRC = serverclient.c tcptest.c

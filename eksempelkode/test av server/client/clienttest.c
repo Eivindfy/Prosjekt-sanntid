@@ -18,13 +18,15 @@ int main(){
 	sleep(2);
 	printf("CLIENTTEST: Sending to socketfd: %s \n", send_buffer);
 	send(socketfd, send_buffer, sizeof(send_buffer), 0);
+	sleep(1);
 	printf("CLIENTTEST: Recieving from socketfd \n");
 	recv(socketfd, recv_buffer, sizeof(recv_buffer), 0);
 	printf("CLIENTTEST: Recieved from socketfd \n");
-	printf("Message from server: %s", recv_buffer);
+	printf("Message from server: %s\n", recv_buffer);
 
 	printf("CLIENTTEST: Sending to socketfd\n");
 	send(socketfd, send_buffer, sizeof(send_buffer), 0);
+	sleep(1);
 	return 0;
 }
 

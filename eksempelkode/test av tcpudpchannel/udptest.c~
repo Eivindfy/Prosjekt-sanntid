@@ -29,7 +29,7 @@ int main(){
 	
 	//sleep(1);
 	printf("UDPTEST: Receiving from socketfd2 \n");
-	recv(socketfd2, recv_buffer, sizeof(recv_buffer), 0);
+	recv(socketfd2, recv_buffer, sizeof(send_buffer), 0);
 	
 	printf("her skal melding komme: %s \n", recv_buffer);
 	return 0;

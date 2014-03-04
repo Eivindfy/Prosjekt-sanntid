@@ -17,18 +17,19 @@ int main(){
 	socketfd = fd[1];
 	pthread_t server;
 	pthread_create(&server,NULL, servermodule, (void *) &fd[0]);
- 	sleep(2);
 	recv(socketfd, recv_buffer, sizeof(recv_buffer), 0);
-	printf("Recieved: %s \n", recv_buffer);	
-	sleep(2);
-	for( int i = 0; i < 3; i++){
-		send_buffer[i] = go_to_floor/pow(10,2-i) + '0';
+	while(1){
+		printf("Write floor you want the elevator to go to: ");
+		scanf("%d", &go_to_floor);
+		for( int i = 0; i < 3; i++){
+			send_buffer[i] = (int)(go_to_floor/pow(10,2-i)) % 10 + '0';
+		}
+		for( int i = 0; i < 3; i++){
+    		send_buffer[1021+i] = client_number/pow(10,2-i) + '0';
+		}
+		send_buffer[3] = '\0';
+		send(socketfd, send_buffer, sizeof(send_buffer), 0);
 	}
-	for( int i = 1024-3; i < 3; i++){
-    	send_buffer[i] = client_number/pow(10,2-i) + '0';
-	}
-	send_buffer[3] = '\0';
-	printf("Sending: %s \n", send_buffer);
-	send(socketfd, send_buffer, sizeof(send_buffer), 0);
+	sleep(1);
 	return 0;
 }

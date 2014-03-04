@@ -135,7 +135,7 @@ void *servermodule(void *module_sockfdvoid){
 
 	while(1){
 //		memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
-		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+//		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
 		FD_SET(module_sockfd, &readfd_set);
 		FD_SET(serverfd, &readfd_set);
 		for( int i = 0; i < sizeof(intern_comunication_sockets);i++){
@@ -150,7 +150,7 @@ void *servermodule(void *module_sockfdvoid){
 //		printf("SERVERCLIENT: select initiated\n");
 		for (int i = 0; i <= fdmax; i++){
 			if (FD_ISSET( i, &readfd_set)){
-				printf("SERVERCLIENT: fd selected %d\n",i);
+//				printf("SERVERCLIENT: fd selected %d\n",i);
 				if(i == serverfd) {
 //					printf("SERVERCLIENT: client conected\n");
 					newfd =  accept(serverfd, NULL, 0);
@@ -161,7 +161,7 @@ void *servermodule(void *module_sockfdvoid){
 					sp = &temp;
 					sp->intern_com = pair_of_sock[0];
 					sp->extern_com = newfd;
-					printf("SERVERCLIENT: new socketfd %d\n", newfd);
+//					printf("SERVERCLIENT: new socketfd %d\n", newfd);
 					for(int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 						if(intern_comunication_sockets[j] == 0)
 							intern_comunication_sockets[j] = pair_of_sock[1];
@@ -178,7 +178,7 @@ void *servermodule(void *module_sockfdvoid){
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 					if( i == intern_comunication_sockets[j]){
 						recv(i,buffer,sizeof(buffer),0);
-						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
+//						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
 						send(module_sockfd,buffer,sizeof(buffer),0);
 						break;
 					}
@@ -190,7 +190,7 @@ void *servermodule(void *module_sockfdvoid){
 					for( int j =  0; j < 3; j++){
 						client_id = (buffer[BUFFER_SIZE-3+j]-'0') * pow(10,j);
 					}
-					printf("SERVERCLIENT: sending message: %s to client: %d and fd: %d\n",	buffer, client_id, intern_comunication_sockets[client_id]);
+//					printf("SERVERCLIENT: sending message: %s to client: %d and fd: %d\n",	buffer, client_id, intern_comunication_sockets[client_id]);
 					send(intern_comunication_sockets[client_id],buffer,sizeof(buffer),0);
 				}
 			}

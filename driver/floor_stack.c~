@@ -15,13 +15,11 @@ int floor_stack_pop(){
 }
 
 // returns 0 if unsuccessful
-int floor_stack_insert(int floor, int up){
+int floor_stack_insert(int floor){
 	if(floor_stack.top >= FLOORSTACKMAXSIZE - 1){
 		return 0;
 	}
 	else{
-	
-	   for(int i=0; 
 		floor_stack.top=floor_stack.top+1;
 		floor_stack.stack[floor_stack.top]=floor;
 		return 1;

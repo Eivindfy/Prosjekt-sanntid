@@ -13,10 +13,11 @@ int top;
 struct FLOORSTACK floor_stack;
 
 
-int pop_floor_stack();
-int push_floor_stack();
-int display_floor_stack_top();
-void clear_floor_stack();
+int floor_stack_pop();
+int floor_stack_display();
+void floor_stack_clear();
+int floor_stack_isempty();
+int floor_stack_insert(int floor, int up);
 
 
 #endif

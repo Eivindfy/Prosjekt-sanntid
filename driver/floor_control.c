@@ -80,3 +80,19 @@ char send_buffer[1024];
         
    }
 }
+
+
+int floor_control_init(){
+	int fd[3];
+	socketpair(PF_LOCAL, SOCK_STREAM, 0,fd);
+
+	int* dynamic_int_pointer =  malloc(sizeof(*dynamic_int_pointer));
+	*dynamic_int_pointer = fd[0];
+	void* dynamic_void_pointer;
+ 	dynamic_void_pointer = (void*)dynamic_int_pointer;
+
+	pthread_t flor_control_thread;
+                                                                 
+	pthread_create(&floor_control_thread,NULL, floor_control, dynamic_voidpointer);
+	return fd[2];
+}

@@ -30,37 +30,37 @@ void* button_return(void * socket_fd_void){
 	
 	
 	char send_buffer[1024];
+	send_buffer[5]='\0';
 	while(1){
-		for (i = 1; i < 3; ++i){
+		for (int i = 1; i < N_FLOORS; i++){
 			if (elev_get_button_signal(BUTTON_CALL_DOWN, i)){
 				send_buffer[0]='d';
-				send_buffer[1]= '0'+i;
-				send_buffer[2]= '\0';
+				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer),0);
 			}
 
 		}
-		for (i = 0; i < 2; ++i){
+		for (int i = 0; i < N_FLOORS-1; i++){
 			if (elev_get_button_signal(BUTTON_CALL_UP, i)){
 				send_buffer[0] = 'u';
-				send_buffer[1] = '0'+i;
-				send_buffer[2] = '\0';
+				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
 			}
 
 
 		}
-		for (i = 0; i < 3; ++i){
+		for (int i = 0; i < N_FLOORS; i++){
 			if(elev_get_button_signal(BUTTON_COMMAND, i)){
 				send_buffer[0] = 'c';
-				send_buffer[1] = '0'+i;
-				send_buffer[2] = '\0';
+				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
 			}
 		if(elev_get_stop_signal()){
 				send_buffer[0] = 's';
-				send_buffer[1] = '0';
-				send_buffer[2] = '\0';
+				send_buffer[1] = '-';
+				send_buffer[2] = '-';
+				send_buffer[3] = '-';
+				send_buffer[4] = '-';
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
 		}
 

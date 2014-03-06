@@ -8,6 +8,8 @@
 
 
 int go_to_floor(int socketfd){
+		int current_floor = get_current_floor(); //placeholder
+		int destination_floor = get_destination_floor() //placeholder
 		int direction;
 		char send_buffer[1024]
 		if current_floor < destination_floor{ // Sets the direction the elevator is travelling
@@ -29,35 +31,33 @@ int go_to_floor(int socketfd){
 			
 			}
 			else{
-				global_current_floor = sensor_signal;
-				elev_set_floor_indicator(global_current_floor);
+				current_floor = sensor_signal;
+				elev_set_floor_indicator(current_floor);
 			}
-			if(global_current_floor == global_destination_floor){
-				elev_set_speed(0);
-				return 0;
-				send_buffer[0] = 'r';
-				insert_floor_into_buffer(global_current_floor, send_buffer);
-				send(socketfd,send_buffer,sizeof(send_buffer),0);
-				global_stop_array[global_current_floor] = 0;
-			}
-			else if(global_stop_array[global_current_floor]){
+			if(stop_array[current_floor]){ //placeholder
 				elev_set_speed(0);
 				sleep(1);
-				if(global_direction == DIRECTION_UP){
+				if(direction == UP){
 					elev_set_speed(300);
 				}
-				else if(global_direction == DIRECTION_DOWN){
+				else if(direction == DOWN){
 					elev_set_speed(-300);
 				}
-				send_buffer[0] = 'v';
-				insert_floor_into_buffer(global_current_floor, send_buffer);
+				//sending "floor visited" to main
+				//set buffer acordingly
 				send(socketfd,send_buffer,sizeof(send_buffer),0);
-				global_stop_array[global_current_floor] = 0;
 			}
-			if(global_current_floor < global_destination_floor && global_direction == DIRECTION_DOWN){
+			if(current_floor == destination_floor){
+				elev_set_speed(0);
+				return 0;
+				//sending "destination reached" to main
+				//set buffer acordingly
+				send(socketfd,send_buffer,sizeof(send_buffer),0);
+			}
+			if(current_floor < destination_floor && direction == DOWN){
 				return -1;
 			}
-			else if (global_current_floor > global_destination_floor && global_direction == DIRECTION_UP){
+			else if (current_floor > destination_floor && direction == UP){
 				return -1;
 			}
 		}
@@ -84,7 +84,7 @@ void * elevator_control(void* socketfd_void){
 		}
 		// check if someting is recieved
 		// set variable destination
-		while(!global_idle){
+		while(!idle){
 			if(go_to_floor(socketfd)<0){
 				perror("Error in go_to_floor elevator_control"); 
 			}
@@ -100,7 +100,7 @@ int elevator_control_init(){
 	int* dynamic_int_pointer =  malloc(sizeof(*dynamic_int_pointer));
 	*dynamic_int_pointer = fd[0];
 	void* dynamic_void_pointer;
-	dynamic_void_pointer = (void*)dynamic_int_pointer;
+  dynamic_void_pointer = (void*)dynamic_int_pointer;
 
 	pthread_t control_thread;
 	

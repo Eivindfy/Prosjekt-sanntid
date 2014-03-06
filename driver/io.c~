@@ -11,8 +11,6 @@
 #include "io.h"
 #include "channels.h"
 
-#include "global_variables.h"
-
 #include <comedilib.h>
 
 

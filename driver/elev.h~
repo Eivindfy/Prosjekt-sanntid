@@ -5,7 +5,7 @@
 #ifndef __INCLUDE_DRIVER_H__
 #define __INCLUDE_DRIVER_H__
 
-#include "global_variables.h"
+#include "global_variables.h";
 
 /**
   Button types for function elev_set_button_lamp() and elev_get_button().

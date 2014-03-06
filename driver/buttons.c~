@@ -6,6 +6,7 @@
 #include "elev.h"
 #include "buttons.h"
 #include "utility_functions.h"
+#include "global_variables.h"
 
 int button_initialize(){
 	int fd[2];
@@ -57,8 +58,10 @@ void* button_return(void * socket_fd_void){
 			}
 		if(elev_get_stop_signal()){
 				send_buffer[0] = 's';
-				send_buffer[1] = '0';
-				send_buffer[2] = '\0';
+				send_buffer[1] = '-';
+				send_buffer[2] = '-';
+				send_buffer[3] = '-';
+				send_buffer[4] = '-';
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
 		}
 

@@ -5,7 +5,6 @@
 
 #include "elev.h"
 #include "buttons.h"
-#include "utility_functions.h"
 
 int button_initialize(){
 	int fd[2];

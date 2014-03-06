@@ -14,7 +14,6 @@
 
 // global variable direction= 1 for up and -1 for down, 0 for IDLE/stopped
 
-// imperative_floor
 
 
 

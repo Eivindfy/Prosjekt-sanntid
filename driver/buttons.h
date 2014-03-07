@@ -1,7 +1,7 @@
-#ifndef
-#define buttons_h
+#ifndef BUTTONS_H
+#define BUTTONS_H
 
-int button_initialize();
+int button_init();
 void* button_return(void * socket_fd_void);
 
 #endif

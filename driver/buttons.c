@@ -8,7 +8,7 @@
 #include "utility_functions.h"
 #include "global_variables.h"
 
-int button_initialize(){
+int button_init(){
 	int fd[2];
 	socketpair(PF_LOCAL, SOCK_STREAM, 0,fd);
 	

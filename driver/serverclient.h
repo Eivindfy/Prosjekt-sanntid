@@ -7,6 +7,6 @@ void *servermodule(void *module_sockfdvoid);
 
 int server_init();
 
-int create_client();
+int client_init();
 
 #endif

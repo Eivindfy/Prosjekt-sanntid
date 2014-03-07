@@ -215,7 +215,7 @@ int server_init(){
 }
 
 
-int create_client(){
+int client_init(){
 	// kode for å koble til og server og sende og motta melding
 	// Rekkefølge
 	// * Lage socket  -  socket() og sette variablene i sockaddr_in

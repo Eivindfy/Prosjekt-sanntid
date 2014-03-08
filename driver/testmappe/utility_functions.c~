@@ -10,12 +10,6 @@ int set_global_stop_array(int floor, int value){
 	return 1;
 }
 
-int get_global_stop_array(int floor){
-	// MUTEX OG GREIER, RETURNER -1 om det failer
-	
-	return global_stop_array[floor];	
-}
-
 
 int floor_to_string(int floor, char* floor_string){
 // antar floors mellom 0 og 9999

@@ -25,10 +25,8 @@ int go_to_floor(int socketfd){
 		// evetualy if this is the destination floor it stops and the function returns
 		while(1){
 			int sensor_signal = elev_get_sensor_signal()
-			if (sensor_signal == -1){
-			
-			}
-			else{
+			if (sensor_signal != -1){
+			{
 				global_current_floor = sensor_signal;
 				elev_set_floor_indicator(global_current_floor);
 			}
@@ -79,14 +77,11 @@ void * elevator_control(void* socketfd_void){
 
 	char recv_buffer[1024];
   while(1){	
-		if(recv(socketfd,recv_buffer,sizeof(recv_buffer),0) < 0){
-			perror("Error recieving in elevator_control");
-		}
 		// check if someting is recieved
 		// set variable destination
-		while(!global_idle){
+		while(!global_direction){
 			if(go_to_floor(socketfd)<0){
-				perror("Error in go_to_floor elevator_control"); 
+				perror("Error in go_to_floor elevator_control\n"); 
 			}
 		}
 	}

@@ -1,3 +1,4 @@
+#define MAIN_FILE
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/time>
@@ -25,11 +26,6 @@ int main(){
 
 	fd_set socket_set;
 	FD_ZERO(&socket_set);
-	FD_SET(udp_socketfd ,&socket_set);
-        FD_SET(tcp_socketfd ,&socket_set);
-        FD_SET(button_socketfd ,&socket_set);
-        FD_SET(elevator_control_socketfd ,&socket_set);
-        FD_SET(floor_control_socketfd ,&socket_set);
 	struct timeval timeout;
 	timeout.tv_sec = 3*60;
         timeout.tv_usec = 0;
@@ -37,6 +33,13 @@ int main(){
 	char recv_buffer[1024]
 	
 	while(1){
+
+        FD_SET(udp_socketfd ,&socket_set);
+        FD_SET(tcp_socketfd ,&socket_set);
+        FD_SET(button_socketfd ,&socket_set);
+        FD_SET(elevator_control_socketfd ,&socket_set);
+        FD_SET(floor_control_socketfd ,&socket_set);
+
 		select(maxfd + 1, &socket_set, NULL, NULL, &timeout);
 		
 		for( int i = 0; i <= maxfd, i ++){
@@ -49,22 +52,25 @@ int main(){
 					send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);
 				}
 				else if(i == button_socketfd){
-                                	recv(i,recv_buffer,sizeof(recv_buffer),0);
+                    recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
 					if(recv_buffer[0] == 'c'){
 						send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);
-					}
-                                }
+        			}
+                }
 				else if(i == elevator_control_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
-					send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0); //ikke sikker på at trengs 
-                                }
+                    if(recv_buffer[0] == 'r'){  
+					    send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0); 
+                    }
+                }
 				else if(i == floor_control_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
-                                }
+                }
 			}
 		}
 	}
+    return 0;
 }

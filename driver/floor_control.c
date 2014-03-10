@@ -10,9 +10,6 @@
 #include <assert.h>
 
 
-//tenker å ha ein thread som går til ein destination og stopper på etasjer som finnes i global_stop_array, så ei utanforløkke som oppdaterer stop_array med hensyn på det den får fra master og rapporterer tilbake. Må ha ein abort-variabel som slutter heisen. FUCK, TRENGER MUTEXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-
 // global variable direction= 1 for up and -1 for down, 0 for IDLE/stopped
 
 

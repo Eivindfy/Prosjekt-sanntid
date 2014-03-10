@@ -39,7 +39,7 @@ char send_buffer[1024];
 			
         
         // IF GETS SOMETHING FROM TASK MANAGER
-			if(control_character>='A' && control_character <= 'Z'){
+			if(control_character>='R'){
         
 				floor_request = get_floor_from_buffer(receive_buffer);
 				if(floor_request < 0){
@@ -54,7 +54,7 @@ char send_buffer[1024];
 						insert_floor_into_buffer(send_buffer,9999);
             		send(socketfd,send_buffer,sizeof(send_buffer),0);
         			}
-        			else if(  (global_direction==1 && (floor_request>global_current_floor && floor_request<global_destination))    ||    (global_direction==-1 && (floor_request<global_current_floor && floor_request > global_destination))   ){
+        			else if( (global_direction==1 && (floor_request>global_current_floor && floor_request<global_destination)) || (global_direction==-1 && (floor_request<global_current_floor && floor_request > global_destination))){
             		set_global_stop_array(floor_request,1);
             		send_buffer[0]='Y';
 						insert_floor_into_buffer(send_buffer,9999);
@@ -62,7 +62,7 @@ char send_buffer[1024];
 					}
         			else{
             		send_buffer[0]='N';
-						insert_floor_into_buffer(send_buffer,9999);
+					insert_floor_into_buffer(send_buffer,9999);
             		send(socketfd,send_buffer,sizeof(send_buffer),0);
         			}
 				}
@@ -109,6 +109,9 @@ char send_buffer[1024];
             }
             if(stop_array_is_empty){
                 global_direction = 0;
+                send_buffer[0]='I';
+                insert_floor_into_buffer(send_buffer,9999);
+                send(socketfd,send_buffer,sizeof(send_buffer),0);
             }
         }
 }

@@ -70,3 +70,31 @@ int get_floor_from_buffer(char* buffer){
 	
 	return floor;
 }
+
+
+int get_elevator_from_buffer(char* buffer){
+	if(sizeof(buffer)<10){
+		perror("Invalid buffer size in insert_floor_into_buffer\n");
+		return -1;
+	}
+	char elevator_string[5];
+	elevator_string[4]='\0';
+	for(int i=0; i<4; i++){
+		elevator_string[i]=buffer[i+5];
+	}
+	int floor = atoi(floor_string);
+	return floor;
+}
+
+int insert_elevator_into_buffer(int elevator, char* buffer){
+	if(sizeof(buffer)<10){
+		perror("Invalid buffer size in insert_floor_into_buffer\n");
+		return -1;
+	}
+	char elevator_string[5];
+	floor_to_string(elevator,elevator_string);
+	for(int i=0; i<4; i++){
+		buffer[i+5]=floor_string[i];
+	}
+	return 1;
+}

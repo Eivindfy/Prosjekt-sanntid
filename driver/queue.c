@@ -5,8 +5,7 @@
 
 
 void queue_initialize(){
- next= 
-  
-  
+ 
+ 
   
 }

@@ -6,4 +6,4 @@ struct ORDER_QUEUE{
   struct QUEUE* next;
 }
 
-struct ORDER_QUEUE order_queue;
+

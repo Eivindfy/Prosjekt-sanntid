@@ -5,7 +5,8 @@
 
 
 void queue_initialize(){
+ struct ORDER_QUEUE order_queue;
  
- 
+ order.
   
 }

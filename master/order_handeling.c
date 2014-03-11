@@ -9,7 +9,7 @@
 #define BUTTON_NONE 0
 
 
-// viss ingen heiser er ledige, vent til ein er ledig
+// Hvis ingen heiser er ledige, vent til ein er ledig
 
 
 int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,int *floor_status, int socketfd){ 

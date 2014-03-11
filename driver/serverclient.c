@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <math.h>
+#include "utility_functions.h"
 
 #define PORT 33546
 #define HOST "129.241.187.155"
@@ -178,6 +179,7 @@ void *servermodule(void *module_sockfdvoid){
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 					if( i == intern_comunication_sockets[j]){
 						recv(i,buffer,sizeof(buffer),0);
+						get_elevator_from_buffer(i,buffer);
 //						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
 						send(module_sockfd,buffer,sizeof(buffer),0);
 						break;
@@ -186,10 +188,7 @@ void *servermodule(void *module_sockfdvoid){
 				if(i == module_sockfd){
 //					printf("SERVERCLIENT: recieved message from server\n");
 					recv(module_sockfd, buffer, sizeof(buffer), 0);
-					int client_id;
-					for( int j =  0; j < 3; j++){
-						client_id = (buffer[BUFFER_SIZE-3+j]-'0') * pow(10,j);
-					}
+					int client_id = get_elevator_from_buffer(buffer);
 //					printf("SERVERCLIENT: sending message: %s to client: %d and fd: %d\n",	buffer, client_id, intern_comunication_sockets[client_id]);
 					send(intern_comunication_sockets[client_id],buffer,sizeof(buffer),0);
 				}

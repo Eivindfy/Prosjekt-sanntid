@@ -2,7 +2,7 @@
 
 struct ORDER_QUEUE{
   int value;
-  char identifier;
+  int direction;
   struct QUEUE* next;
 }
 

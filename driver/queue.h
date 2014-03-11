@@ -1,9 +1,9 @@
-
 //#include "global_variables.h"
 
-struct QUEUE{
+struct ORDER_QUEUE{
   int value;
+  char identifier;
   struct QUEUE* next;
 }
 
-struct QUEUE order_queue;
+struct ORDER_QUEUE order_queue;

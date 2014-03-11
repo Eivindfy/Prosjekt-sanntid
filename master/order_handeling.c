@@ -26,7 +26,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,i
                        send(socketfd,send_buffer,sizeof(send_buffer),0);
                        //kanskje gi tilbakemelding her
                        elevator_status[elevator_number] = i;
-                       floor_status[i] = floor_status[i] == BUTTON_BOTH ? floor_status[i] = BUTTON_PENDING : floor_status[i] =BUTTON_NONE;
+                       floor_status[i] = floor_status[i] == BUTTON_BOTH ? BUTTON_PENDING : BUTTON_NONE;
                        break;
                     }
                 } 

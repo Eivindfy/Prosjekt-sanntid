@@ -31,7 +31,7 @@ void* button_return(void * socket_fd_void){
 	int down_button[N_FLOORS];
 	int up_button[N_FLOORS];
 	int command_button[N_FLOORS];
-	
+	elev_init();
 	for(int i = 0; i < N_FLOORS; i++){
 		down_button[i] = 0;
 		up_button[i] = 0;
@@ -46,6 +46,7 @@ void* button_return(void * socket_fd_void){
 				send_buffer[0]='d';
 				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer),0);
+//				printf("BUTTONS: sent buffer %s to sockfd %d", send_buffer, socket_fd);
 				down_button[i] = 1;
 			}
 			else if ( (!elev_get_button_signal(BUTTON_CALL_DOWN, i)) && down_button[i]){
@@ -58,6 +59,7 @@ void* button_return(void * socket_fd_void){
 				send_buffer[0] = 'u';
 				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
+//				printf("BUTTONS: sent buffer %s to sockfd %d", send_buffer, socket_fd);
 				up_button[i] = 1;
 			}
 			else if ( (!elev_get_button_signal(BUTTON_CALL_UP, i)) && up_button[i]){
@@ -71,11 +73,13 @@ void* button_return(void * socket_fd_void){
 				send_buffer[0] = 'c';
 				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
+//				printf("BUTTONS: sent buffer %s to sockfd %d", send_buffer, socket_fd);
 				command_button[i] = 1;
 			}
-			else if(elev_get_button_signal(BUTTON_COMMAND, i) && !command_button[i]){
+			else if(!elev_get_button_signal(BUTTON_COMMAND, i) && command_button[i]){
 				command_button[i] = 0;
 			}
+		}
 		if(elev_get_stop_signal()){
 				send_buffer[0] = 's';
 				send_buffer[1] = '-';
@@ -86,6 +90,6 @@ void* button_return(void * socket_fd_void){
 		}
 
 
-		}
+		
 	}
 }

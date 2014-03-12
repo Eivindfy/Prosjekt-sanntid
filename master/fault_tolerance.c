@@ -1,17 +1,19 @@
+#include <stdio.h>		//inkludet stdio og stdlib
+#include <stdlib.h>
 #include "tcpudpchannel.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/time.h>
-
+#include <pthread.h>
 
 void * backup_module(void * socketfd_void){
 	int tcpsocketfd = *(int*) socketfd_void;
-	free(tcp_socketfd_void);
+	free(socketfd_void);									// endret fra 'tcp_socketfd_void' til 'socket_fd'
 
 	int udp_socketfd = tcpudpchannel_init();
-	char[1024] send_buffer;
+	char send_buffer[1024]; 							// flyttet [1024]
 	
-	send(se
+	send(tcpsocketfd, send_buffer, sizeof(send_buffer), 0); //fylte ut argumenter
 	
 }
 

@@ -43,8 +43,8 @@ int floor_to_string(int floor, char* floor_string){
 }
 
 int insert_floor_into_buffer(int floor, char* buffer){
-	if(sizeof(buffer)<6){
-		perror("Invalid buffer size in insert_floor_into_buffer\n");
+	if(sizeof(buffer)<5){
+		printf("Invalid buffer size in insert_floor_into_buffer\n");
 		return 0;
 	}
 	char floor_string[5];
@@ -56,8 +56,8 @@ int insert_floor_into_buffer(int floor, char* buffer){
 }
 
 int get_floor_from_buffer(char* buffer){
-	if(sizeof(buffer)<6){
-		perror("Invalid buffer size in insert_floor_into_buffer\n");
+	if(sizeof(buffer)<5){
+		printf("Invalid buffer size in get_floor_from_buffer\n");
 		return -1;
 	}
 	char floor_string[5];
@@ -73,8 +73,8 @@ int get_floor_from_buffer(char* buffer){
 
 
 int get_elevator_from_buffer(char* buffer){
-	if(sizeof(buffer)<10){
-		perror("Invalid buffer size in insert_floor_into_buffer\n");
+	if(sizeof(buffer)<8){
+		printf("Invalid buffer size in get_elevato_from_buffer: %lu\n",sizeof(buffer));
 		return -1;
 	}
 	char elevator_string[5];
@@ -87,8 +87,8 @@ int get_elevator_from_buffer(char* buffer){
 }
 
 int insert_elevator_into_buffer(int elevator, char* buffer){
-	if(sizeof(buffer)<10){
-		perror("Invalid buffer size in insert_floor_into_buffer\n");
+	if(sizeof(buffer)<8){
+		printf("Invalid buffer size in insert_elevator_into_buffer: %lu\n", sizeof(buffer));
 		return -1;
 	}
 	char elevator_string[5];

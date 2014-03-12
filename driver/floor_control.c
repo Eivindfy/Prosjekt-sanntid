@@ -50,9 +50,10 @@ char send_buffer[1024];
         			if(global_direction==0){
             		set_global_stop_array(floor_request,1);
             		global_destination=floor_request;
-								send_buffer[0]='Y';
-								insert_floor_into_buffer(9999,send_buffer);
+						send_buffer[0]='Y';
+						insert_floor_into_buffer(global_destination,send_buffer);
             		send(socketfd,send_buffer,sizeof(send_buffer),0);
+						printf("FLOOR_CONTROL: sent to main: %s\n",send_buffer);
         			}
         			else if( (global_direction==1 && (floor_request>global_current_floor && floor_request<global_destination)) || (global_direction==-1 && (floor_request<global_current_floor && floor_request > global_destination))){
             		set_global_stop_array(floor_request,1);
@@ -101,6 +102,7 @@ char send_buffer[1024];
                     }
                 }
             }
+				printf("FLOOR_CONTROL: stop_array_is_empty = %i",stop_array_is_empty);
             if(stop_array_is_empty){
                 global_direction = 0;
                 send_buffer[0]='I';

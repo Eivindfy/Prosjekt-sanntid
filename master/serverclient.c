@@ -16,8 +16,8 @@
 #include <unistd.h>
 
 #define PORT 33546
-#define HOST "129.241.187.155"
-#define MY_IP "129.241.187.150"
+#define HOST "129.241.187.143"
+#define MY_IP "129.241.187.143"
 #define MY_PORT 20000
 #define NUMBER_OF_CONNECTIONS 10
 #define BUFFER_SIZE 1024
@@ -88,7 +88,7 @@ void *servermodule(void *module_sockfdvoid){
 	for( int i = 0; i < NUMBER_OF_CONNECTIONS; i++){
 		intern_comunication_sockets[i] = 0;
 	}
-	char buffer[BUFFER_SIZE];
+	char buffer[1024];
 
 	// Lager socket og initialiserer og setter verdier til sockaddr_in
 	struct sockaddr_in *server_addr;
@@ -180,7 +180,9 @@ void *servermodule(void *module_sockfdvoid){
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 					if( i == intern_comunication_sockets[j]){
 						recv(i,buffer,sizeof(buffer),0);
-						insert_elevator_into_buffer(i,buffer);
+						if(insert_elevator_into_buffer(j,buffer)==-1){
+							printf("SERVERCLIENT: error inserting elevator into buffer\n");
+						}
 //						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
 						send(module_sockfd,buffer,sizeof(buffer),0);
 						break;

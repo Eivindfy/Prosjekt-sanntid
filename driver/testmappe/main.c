@@ -1,25 +1,29 @@
-#define MAIN_FILE
+//#define MAIN_FILE
 
-#include "global_variables.h"
+//#include "global_variables.h"
 #include <stdio.h>
-#include "utility_functions.h"
-#include <string.h>
+#include "queue.h"
+//#include "utility_functions.h"
+//#include <string.h>
 
 
 
 
 int main(){
-	global_stop_array[1]=1;
-	printf("før funk: %i\n", global_stop_array[1]);
-	set_global_stop_array(1,0);
-	printf("etter funk: %i\n", global_stop_array[1]);
-	char buffer[1024];
-	strcpy(buffer,"d0104");
-	int floor = 0;
-	floor = get_floor_from_buffer(buffer);
-	printf("%i \n", floor);	
-	insert_floor_into_buffer(floor, buffer);
-	printf("buffer : %s \n", buffer);
+	
+	struct order_queue temp;
+	order_queue_isempty();
+	order_queue_initialize();
+	order_queue_insert(0110,1);
+	order_queue_insert(0111,1);
+	order_queue_insert(0110,1);
+	order_queue_insert(0110,-1);
+	for(int i=0; i<4;i++){
+		temp=order_queue_pop();
+		printf("floor: %i, direction: %i \n",temp.floor,temp.direction);
+	
+	}
+	
 	
 	
 	

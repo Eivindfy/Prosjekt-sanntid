@@ -201,7 +201,9 @@ void *servermodule(void *module_sockfdvoid){
 
 int server_init(){
 	int fd[2];
-	socketpair(PF_LOCAL, SOCK_STREAM, 0,fd);
+	if (socketpair(PF_LOCAL, SOCK_STREAM, 0,fd)<0){
+		printf("ERROR IN SERVER INIT%s\n", strerror(errno));
+	}
 
 	int* dynamic_int_pointer =  malloc(sizeof(*dynamic_int_pointer));
 	*dynamic_int_pointer = fd[0];

@@ -5,7 +5,7 @@ CFLAGS = -std=c99 -g -Wall -O2 -I . -MMD
 LDFLAGS = -lpthread -lcomedi -g -lm
 
 # list of sources
-ELEVSRC = utility_functions.c main.c
+ELEVSRC = queue.c main.c
 
 # program executable file name.
 TARGET = lift

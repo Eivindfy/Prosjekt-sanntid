@@ -77,9 +77,16 @@ int go_to_floor(int socketfd){
 void * elevator_control(void* socketfd_void){
 	
 	int socketfd = * (int* ) socketfd_void;
-	
-	// delete socketfd_void
+	if(global_current_floor == -1){
+		elev_set_speed(-300);
+		while(elev_get_floor_sensor_signal()==-1){
+			
+		}
+		global_current_floor = elev_get_floor_sensor_signal();
+	}
 
+	// delete socketfd_void
+	printf("ELEVATOR_CONTROL: global_current_floor is %d\n",global_current_floor);
   while(1){	
 		// check if someting is recieved
 		// set variable destination

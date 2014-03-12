@@ -6,7 +6,7 @@
 struct ORDER_QUEUE{
   int floor;
   int direction;
-  struct QUEUE* next;
+  struct ORDER_QUEUE* next;
 };
 
 struct ORDER_QUEUE* root;

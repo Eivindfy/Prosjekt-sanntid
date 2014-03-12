@@ -11,9 +11,24 @@
 
 int main(){
 	
-	struct order_queue temp;
+	struct ORDER_QUEUE temp;
+	//order_queue_isempty();
 	order_queue_initialize();
-	order_queue_insert
+	order_queue_destroy();
+	order_queue_initialize();
+	order_queue_insert(110,1);
+	order_queue_insert(111,1);
+	order_queue_insert(110,1);
+	order_queue_insert(110,-1);
+	
+	for(int i=0; i<6;i++){
+	
+	    if(!order_queue_isempty()){
+		temp=order_queue_pop();
+		printf("Iteration: %i floor: %i, direction: %i \n",i,temp.floor,temp.direction);
+		}
+	
+	}
 	
 	
 	

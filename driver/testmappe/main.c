@@ -11,16 +11,21 @@
 
 int main(){
 	
-	struct order_queue temp;
-	order_queue_isempty();
+	struct ORDER_QUEUE temp;
 	order_queue_initialize();
-	order_queue_insert(0110,1);
-	order_queue_insert(0111,1);
-	order_queue_insert(0110,1);
-	order_queue_insert(0110,-1);
-	for(int i=0; i<4;i++){
+	order_queue_destroy();
+	order_queue_initialize();
+	order_queue_insert(110,1);
+	order_queue_insert(111,1);
+	order_queue_insert(110,1);
+	order_queue_insert(110,-1);
+	
+	for(int i=0; i<6;i++){
+	
+	    if(!order_queue_isempty()){
 		temp=order_queue_pop();
-		printf("floor: %i, direction: %i \n",temp.floor,temp.direction);
+		printf("Iteration: %i floor: %i, direction: %i \n",i,temp.floor,temp.direction);
+		}
 	
 	}
 	

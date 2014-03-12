@@ -84,7 +84,7 @@ char send_buffer[1024];
 		
       else if(control_character == 'r'){
             int stop_array_is_empty = 1;
-            if (global_direction == 1){
+            if (global_direction == DIRECTION_UP){
                 for(int i = 0; i > N_FLOORS; i ++){
                     if (get_global_stop_array(i)){
                         global_destination = i;
@@ -93,7 +93,7 @@ char send_buffer[1024];
                     }
                 }
             }
-				else if (global_direction == -1){
+				else if (global_direction == DIRECTION_DOWN){
 					for(int i = N_FLOORS; i > 0; i--){
                     if (get_global_stop_array(i)){
                         global_destination = i;
@@ -102,7 +102,7 @@ char send_buffer[1024];
                     }
                 }
             }
-				printf("FLOOR_CONTROL: stop_array_is_empty = %i",stop_array_is_empty);
+						printf("FLOOR_CONTROL: stop_array_is_empty = %i",stop_array_is_empty);
             if(stop_array_is_empty){
                 global_direction = 0;
                 send_buffer[0]='I';

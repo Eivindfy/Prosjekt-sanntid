@@ -73,10 +73,10 @@ int main(){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					printf("MAIN: recieved message from elevator_control: %s\n",recv_buffer);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
-            	if(recv_buffer[0] == 'r'){  
-					    send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0); 
-            	}
-        		}
+					if(recv_buffer[0] == 'r'){  
+						send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0); 
+					}
+				}
 				else if(i == floor_control_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);

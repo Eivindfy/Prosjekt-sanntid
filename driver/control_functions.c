@@ -37,8 +37,11 @@ int go_to_floor(int socketfd){
 			}
 			if(global_current_floor == global_destination){
 				elev_set_speed(0);
+        send_buffer[0] = 'r';
+        insert_floor_into_buffer(global_current_floor, send_buffer);
+        send(socketfd,send_buffer,sizeof(send_buffer),0);
+        global_stop_array[global_current_floor] = 0;
 				return 0;
-				send_buffer[0] = 'r';
 			}
 			else if(global_stop_array[global_current_floor]){
 				elev_set_speed(0);
@@ -93,18 +96,15 @@ void * elevator_control(void* socketfd_void){
 		// set variable destination
 		usleep(100000);
 //		printf("ELEVATOR_CONTROL: global_destination != global_current_floor = %i\n",global_destination != global_current_floor); 
-		while(global_destination != global_current_floor){
+		while(global_destination != global_current_floor || global_stop_array[global_current_floor]){
 			printf("ELEVATOR_CONTROL: going to floor %d\n",global_destination);
 			if(go_to_floor(socketfd)<0){
-				perror("Error in go_to_floor elevator_control\n"); 
+				global_stop_array[global_current_floor] = 0;
+				send_buffer[0] = 'r';
+				insert_floor_into_buffer(global_current_floor, send_buffer);
+				send(socketfd,send_buffer,sizeof(send_buffer),0);
+				global_stop_array[global_current_floor] = 0;
 			}
-		}
-		if(global_stop_array[global_current_floor] == 1){
-			global_stop_array[global_current_floor] = 0;
-			send_buffer[0] = 'r';
-			insert_floor_into_buffer(global_current_floor, send_buffer);
-			send(socketfd,send_buffer,sizeof(send_buffer),0);
-			global_stop_array[global_current_floor] = 0;
 		}
 	}
 	return 0;

@@ -20,7 +20,7 @@ int button_init(){
 	
 	pthread_t button_thread;
 
-	pthread_create(&button_thread,NULL, button_return, dynamic_voidpointer);
+	pthread_create(&button_thread,NULL, button_return, dynamic_void_pointer);
 	return fd[1];
 }
 

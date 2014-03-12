@@ -82,8 +82,8 @@ int get_elevator_from_buffer(char* buffer){
 	for(int i=0; i<4; i++){
 		elevator_string[i]=buffer[i+5];
 	}
-	int floor = atoi(floor_string);
-	return floor;
+	int elevator = atoi(elevator_string);
+	return elevator;
 }
 
 int insert_elevator_into_buffer(int elevator, char* buffer){
@@ -94,7 +94,7 @@ int insert_elevator_into_buffer(int elevator, char* buffer){
 	char elevator_string[5];
 	floor_to_string(elevator,elevator_string);
 	for(int i=0; i<4; i++){
-		buffer[i+5]=floor_string[i];
+		buffer[i+5]=elevator_string[i];
 	}
 	return 1;
 }

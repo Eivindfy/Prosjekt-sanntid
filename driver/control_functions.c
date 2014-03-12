@@ -1,6 +1,12 @@
 #include "elev.h"
 #include <stdio.h>
 #include "global_variables.h"
+#include "utility_functions.h"
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <pthread.h>
 /*
  *	This function makes the elevator go from one floor to a destination
  *	floor and stopping on intetmidiate floors if the it is ordered so.
@@ -8,15 +14,14 @@
 
 
 int go_to_floor(int socketfd){
-		int direction;
-		char send_buffer[1024]
-		if current_floor < destination_floor{ // Sets the direction the elevator is travelling
+		char send_buffer[1024];
+		if(global_current_floor < global_destination){ // Sets the direction the elevator is travelling
 			elev_set_speed(300);
-			direction = UP;
+			global_direction = DIRECTION_UP;
 		}
-		else if current_floor > destination_floor{
+		else if (global_current_floor > global_destination){
 			elev_set_speed(-300);
-			direction = DOWN;
+			global_direction = DIRECTION_DOWN;
 		}
 		else
 			return -1;
@@ -24,13 +29,13 @@ int go_to_floor(int socketfd){
 		// If it has it checks the order queue if it whould stop on this floor 
 		// evetualy if this is the destination floor it stops and the function returns
 		while(1){
-			int sensor_signal = elev_get_sensor_signal()
-			if (sensor_signal != -1){
+			int sensor_signal = elev_get_floor_sensor_signal();
+			if (sensor_signal != -1)
 			{
 				global_current_floor = sensor_signal;
 				elev_set_floor_indicator(global_current_floor);
 			}
-			if(global_current_floor == global_destination_floor){
+			if(global_current_floor == global_destination){
 				elev_set_speed(0);
 				return 0;
 				send_buffer[0] = 'r';
@@ -52,10 +57,10 @@ int go_to_floor(int socketfd){
 				send(socketfd,send_buffer,sizeof(send_buffer),0);
 				global_stop_array[global_current_floor] = 0;
 			}
-			if(global_current_floor < global_destination_floor && global_direction == DIRECTION_DOWN){
+			if(global_current_floor < global_destination && global_direction == DIRECTION_DOWN){
 				return -1;
 			}
-			else if (global_current_floor > global_destination_floor && global_direction == DIRECTION_UP){
+			else if (global_current_floor > global_destination && global_direction == DIRECTION_UP){
 				return -1;
 			}
 		}
@@ -75,16 +80,16 @@ void * elevator_control(void* socketfd_void){
 	
 	// delete socketfd_void
 
-	char recv_buffer[1024];
   while(1){	
 		// check if someting is recieved
 		// set variable destination
-		while(!global_direction){
+		while(global_direction){
 			if(go_to_floor(socketfd)<0){
 				perror("Error in go_to_floor elevator_control\n"); 
 			}
 		}
 	}
+	return 0;
 }
 
 
@@ -99,6 +104,6 @@ int elevator_control_init(){
 
 	pthread_t control_thread;
 	
-	pthread_create(&control_thread,NULL, elevatro_control, dynamic_voidpointer);
-	return fd[2];
+	pthread_create(&control_thread,NULL, elevator_control, dynamic_void_pointer);
+	return fd[1];
 }

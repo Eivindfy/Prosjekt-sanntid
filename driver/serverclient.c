@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <math.h>
 #include "utility_functions.h"
+#include <unistd.h>
 
 #define PORT 33546
 #define HOST "129.241.187.155"
@@ -179,7 +180,7 @@ void *servermodule(void *module_sockfdvoid){
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 					if( i == intern_comunication_sockets[j]){
 						recv(i,buffer,sizeof(buffer),0);
-						get_elevator_from_buffer(i,buffer);
+						insert_elevator_into_buffer(i,buffer);
 //						printf("SERVERCLIENT: recieved message from client: %s\n", buffer);
 						send(module_sockfd,buffer,sizeof(buffer),0);
 						break;
@@ -209,8 +210,8 @@ int server_init(){
 
 	pthread_t server_thread;
 	
-	pthread_create(&server_thread,NULL, servermodule, dynamic_voidpointer);
-	return fd[2];
+	pthread_create(&server_thread,NULL, servermodule, dynamic_void_pointer);
+	return fd[1];
 }
 
 

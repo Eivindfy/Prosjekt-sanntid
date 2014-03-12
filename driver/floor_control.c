@@ -2,10 +2,13 @@
 #include "elev.h"
 #include "io.h"
 #include "global_variables.h"
+#include "utility_functions.h"
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
+#include <pthread.h>
 
 #include <assert.h>
 
@@ -17,7 +20,7 @@
 
 void* floor_control(void* socketfd_void){
 
-int socketfd = *((int*)socketfd_void));
+int socketfd = *((int*)socketfd_void);
 free(socketfd_void);
 
 int floor_request = 0;
@@ -47,44 +50,38 @@ char send_buffer[1024];
         			if(global_direction==0){
             		set_global_stop_array(floor_request,1);
             		global_destination=floor_request;
-						send_buffer[0]='Y';
-						insert_floor_into_buffer(send_buffer,9999);
+								send_buffer[0]='Y';
+								insert_floor_into_buffer(9999,send_buffer);
             		send(socketfd,send_buffer,sizeof(send_buffer),0);
         			}
         			else if( (global_direction==1 && (floor_request>global_current_floor && floor_request<global_destination)) || (global_direction==-1 && (floor_request<global_current_floor && floor_request > global_destination))){
             		set_global_stop_array(floor_request,1);
             		send_buffer[0]='Y';
-						insert_floor_into_buffer(send_buffer,9999);
+						insert_floor_into_buffer(9999,send_buffer);
             		send(socketfd,send_buffer,sizeof(send_buffer),0);                
 					}
         			else{
             		send_buffer[0]='N';
-					insert_floor_into_buffer(send_buffer,9999);
+					insert_floor_into_buffer(9999,send_buffer);
             		send(socketfd,send_buffer,sizeof(send_buffer),0);
         			}
 				}
-			}
-        
-        
-        
-        
-        
-        // IF GETS SOMETHING FROM BUTTON
-        else if(control_character == 'c'){
+			}// IF GETS SOMETHING FROM BUTTON
+			else if(control_character == 'c'){
 				floor_request = get_floor_from_buffer(receive_buffer);
         
                         
-        		if(  (global_direction==1 && floor_request > global_destination) || (global_direction==-1 && floor_request < global_destination) ){
-            	set_global_stop_array(floor_request,1);
-            	global_destination=floor_request;    
+				if((global_direction==1 && floor_request > global_destination) || (global_direction==-1 && floor_request < global_destination) ){
+           set_global_stop_array(floor_request,1);
+					 global_destination=floor_request;    
 				}
-        		else{
-            	set_global_stop_array(floor_request,1);
-        		}
+        else{
+           set_global_stop_array(floor_request,1);
+        }
         
     		}    
-		}
-        else if(control_character == 'r'){
+		
+      else if(control_character == 'r'){
             int stop_array_is_empty = 1;
             if (global_direction == 1){
                 for(int i = 0; i > N_FLOORS; i ++){
@@ -107,10 +104,11 @@ char send_buffer[1024];
             if(stop_array_is_empty){
                 global_direction = 0;
                 send_buffer[0]='I';
-                insert_floor_into_buffer(send_buffer,9999);
+                insert_floor_into_buffer(9999,send_buffer);
                 send(socketfd,send_buffer,sizeof(send_buffer),0);
             }
         }
+	 }
 }
 
 
@@ -123,8 +121,8 @@ int floor_control_init(){
 	void* dynamic_void_pointer;
  	dynamic_void_pointer = (void*)dynamic_int_pointer;
 
-	pthread_t flor_control_thread;
+	pthread_t floor_control_thread;
                                                                  
-	pthread_create(&floor_control_thread,NULL, floor_control, dynamic_voidpointer);
+	pthread_create(&floor_control_thread,NULL, floor_control, dynamic_void_pointer);
 	return fd[1];
 }

@@ -1,12 +1,14 @@
 #define MAIN_FILE
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/time>
+#include <sys/time.h>
 #include "buttons.h"
 #include "serverclient.h"
 #include "control_functions.h"
 #include "floor_control.h"
 #include "tcpudpchannel.h"
+#include "global_variables.h"
+#define NULL 0
 
 
 int main(){
@@ -23,6 +25,8 @@ int main(){
 	maxfd = elevator_control_socketfd > maxfd ? elevator_control_socketfd : maxfd;
 	int floor_control_socketfd = floor_control_init();
 	maxfd = floor_control_socketfd > maxfd ? floor_control_socketfd : maxfd;
+	
+	initialize_global_variables();
 
 	fd_set socket_set;
 	FD_ZERO(&socket_set);
@@ -30,7 +34,7 @@ int main(){
 	timeout.tv_sec = 3*60;
         timeout.tv_usec = 0;
 	
-	char recv_buffer[1024]
+	char recv_buffer[1024];
 	
 	while(1){
 
@@ -42,7 +46,7 @@ int main(){
 
 		select(maxfd + 1, &socket_set, NULL, NULL, &timeout);
 		
-		for( int i = 0; i <= maxfd, i ++){
+		for( int i = 0; i <= maxfd; i ++){
 			if(FD_ISSET(i,&socket_set)){
 				if(i == udp_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);

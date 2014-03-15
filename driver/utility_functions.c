@@ -2,6 +2,14 @@
 #include "global_variables.h"
 #include "utility_functions.h"
 #include <stdlib.h>
+#include <pthread.h>
+
+pthread_mutex_t destination_lock;
+
+int mutex_init(){
+	pthread_mutex_init(&destination_lock, NULL);
+	return 1;
+}
 
 int set_global_stop_array(int floor, int value){
 	//her kan mutexer og sånn komme   return 0 eller -1 if fail
@@ -15,6 +23,23 @@ int get_global_stop_array(int floor){
 	
 	return global_stop_array[floor];	
 }
+
+int set_global_destination(int value){
+	pthread_mutex_lock(&destination_lock);
+	global_destination = value;
+	pthread_mutex_unlock(&destination_lock);
+	return 1;
+}
+
+
+int get_global_destination(){
+	pthread_mutex_lock(&destination_lock);
+	int temp = global_destination;
+	pthread_mutex_unlock(&destination_lock);
+	return temp;
+}
+
+
 
 
 int floor_to_string(int floor, char* floor_string){

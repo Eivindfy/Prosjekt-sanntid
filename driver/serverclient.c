@@ -16,8 +16,8 @@
 #include <unistd.h>
 
 #define PORT 33546
-#define HOST "129.241.187.143"
-#define MY_IP "129.241.187.143"
+#define HOST "129.241.187.158"
+#define MY_IP "129.241.187.158"
 #define MY_PORT 20000
 #define NUMBER_OF_CONNECTIONS 10
 #define BUFFER_SIZE 1024
@@ -33,16 +33,16 @@ void* server_client_comunication(void* spvoid){
 	fd_set communicationfd_set;
 	int fdmax;
 	struct timeval timeout;
-	timeout.tv_sec = 3*60;
-	timeout.tv_usec = 0;
 	FD_ZERO(&communicationfd_set);
 	FD_SET(sp->intern_com, &communicationfd_set);
 	FD_SET(sp->extern_com, &communicationfd_set);
 	fdmax = sp->intern_com >= sp->extern_com ? sp->intern_com : sp->extern_com;
 //	printf("SERVERCLIENT: pthread_created\n");
 	while(1){
+		timeout.tv_sec = 3*60;
+		timeout.tv_usec = 0;
 		FD_SET(sp->intern_com, &communicationfd_set);
-	        FD_SET(sp->extern_com, &communicationfd_set);
+		FD_SET(sp->extern_com, &communicationfd_set);
 		if(select(fdmax+1, &communicationfd_set, NULL, NULL, &timeout) <= 0 ){
 			printf("Error in select in server_client_comunication");
 //			return -1;
@@ -110,9 +110,6 @@ void *servermodule(void *module_sockfdvoid){
 	FD_ZERO(&masterfd_set);
 	FD_ZERO(&readfd_set);
 	fdmax = serverfd;
-	timeout.tv_sec = 3*60;
-	timeout.tv_usec = 0;
-	
 	// Forandrer på instillingene slik at socketen/porten er gjenbrukbar 
 	int yes = 1; // Denne er 1 fordi vi skal slå på SO_REUSEADDR
 	if(setsockopt(serverfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(*server_addr))==-1){
@@ -138,6 +135,8 @@ void *servermodule(void *module_sockfdvoid){
 	while(1){
 //		memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
 //		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+		timeout.tv_sec = 3*60;
+		timeout.tv_usec = 0;
 		FD_SET(module_sockfd, &readfd_set);
 		FD_SET(serverfd, &readfd_set);
 		for( int i = 0; i < sizeof(intern_comunication_sockets);i++){

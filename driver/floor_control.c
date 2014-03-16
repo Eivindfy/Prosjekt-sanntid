@@ -75,8 +75,8 @@ char send_buffer[1024];
 					set_global_destination(floor_request);
 					set_global_stop_array(floor_request,1);
 					send_buffer[0] = 'g';
-												insert_floor_into_buffer(get_global_destination(), send_buffer);
-												send(socketfd,send_buffer,sizeof(send_buffer),0);
+					insert_floor_into_buffer(get_global_destination(), send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
 				}                
 				else if((global_direction==1 && floor_request > get_global_destination()) || (global_direction==-1 && floor_request < get_global_destination()) ){
            set_global_stop_array(floor_request,1);
@@ -108,7 +108,7 @@ char send_buffer[1024];
                     if (get_global_stop_array(i)){
                         set_global_destination(i);
                         stop_array_is_empty = 0;
-						                        send_buffer[0] = 'g';
+						            send_buffer[0] = 'g';
 												insert_floor_into_buffer(get_global_destination(), send_buffer);
 												send(socketfd,send_buffer,sizeof(send_buffer),0);
                         break;

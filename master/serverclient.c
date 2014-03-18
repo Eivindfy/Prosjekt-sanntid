@@ -37,7 +37,7 @@ void* server_client_comunication(void* spvoid){
 	FD_SET(sp->intern_com, &communicationfd_set);
 	FD_SET(sp->extern_com, &communicationfd_set);
 	fdmax = sp->intern_com >= sp->extern_com ? sp->intern_com : sp->extern_com;
-//	printf("SERVERCLIENT: pthread_created\n");
+	printf("SERVERCLIENT: pthread_created\n");
 	while(1){
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
@@ -134,7 +134,7 @@ void *servermodule(void *module_sockfdvoid){
 
 	while(1){
 //		memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
-//		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
 		FD_SET(module_sockfd, &readfd_set);
@@ -151,7 +151,7 @@ void *servermodule(void *module_sockfdvoid){
 //		printf("SERVERCLIENT: select initiated\n");
 		for (int i = 0; i <= fdmax; i++){
 			if (FD_ISSET( i, &readfd_set)){
-//				printf("SERVERCLIENT: fd selected %d\n",i);
+				printf("SERVERCLIENT: fd selected %d\n",i);
 				if(i == serverfd) {
 //					printf("SERVERCLIENT: client conected\n");
 					newfd =  accept(serverfd, NULL, 0);
@@ -162,7 +162,7 @@ void *servermodule(void *module_sockfdvoid){
 					sp = &temp;
 					sp->intern_com = pair_of_sock[0];
 					sp->extern_com = newfd;
-//					printf("SERVERCLIENT: new socketfd %d\n", newfd);
+					printf("SERVERCLIENT: new socketfd %d\n", newfd);
 					for(int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 						if(intern_comunication_sockets[j] == 0)
 							intern_comunication_sockets[j] = pair_of_sock[1];
@@ -174,7 +174,9 @@ void *servermodule(void *module_sockfdvoid){
 					if(pthread_create(&thread, NULL, server_client_comunication , (void *) sp) == -1){
 						printf("Error creating pthread.\n");
 //						return -1;
-					}	
+					}
+					printf("SERVERCLIENT: new socketfd %d\n", newfd);
+					break;	
 				}
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 					if( i == intern_comunication_sockets[j]){
@@ -186,6 +188,7 @@ void *servermodule(void *module_sockfdvoid){
 						send(module_sockfd,buffer,sizeof(buffer),0);
 						break;
 					}
+					break;
 				}
 				if(i == module_sockfd){
 //					printf("SERVERCLIENT: recieved message from server\n");
@@ -193,6 +196,7 @@ void *servermodule(void *module_sockfdvoid){
 					int client_id = get_elevator_from_buffer(buffer);
 //					printf("SERVERCLIENT: sending message: %s to client: %d and fd: %d\n",	buffer, client_id, intern_comunication_sockets[client_id]);
 					send(intern_comunication_sockets[client_id],buffer,sizeof(buffer),0);
+					break;
 				}
 			}
 		}

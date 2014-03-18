@@ -47,9 +47,10 @@ int main (){
         for(int i = 0; i <= maxfd; i++){
             if(FD_ISSET(i, &socket_set)){
                 if(i == tcp_socketfd){
-                    recv(tcp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
-						  printf("MAIN: recived message: %s\n ",recv_buffer);
-						  handle_message(recv_buffer,elevator_status,elevator_floor,root,tcp_socketfd);
+		  printf("MAIN: recieving message\n ");	
+                  recv(tcp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
+		  printf("MAIN: recived message: %s\n ",recv_buffer);
+	   	  handle_message(recv_buffer,elevator_status,elevator_floor,root,tcp_socketfd);
               }
             
             }

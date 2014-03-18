@@ -12,7 +12,7 @@
 #define BUTTON_PENDING 4
 #define BUTTON_NONE 0
 #define N_FLOOR 4
-#define N_ELEVATOR 1
+#define N_ELEVATOR 2
 
 // Hvis ingen heiser er ledige, vent til ein er ledig
 
@@ -46,6 +46,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 						send(socketfd,send_buffer,sizeof(send_buffer),0);
 						elevator_status[i] = floor_number;
 						order_given = 1; 
+						printf("HANDLE_MESSAGE: order given to elevator %i\n",i);
 						break;
 					}
 					else if(elevator_floor[i] > floor_number && elevator_status[i] <= floor_number){

@@ -9,6 +9,7 @@
 #include "floor_control.h"
 #include "tcpudpchannel.h"
 #include "global_variables.h"
+#include "utility_functions.h"
 //#define NULL 0
 
 
@@ -64,7 +65,7 @@ int main(){
 				else if(i == button_socketfd){
      			   recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
-//					printf("MAIN: sent message: %s\n",recv_buffer);
+					printf("MAIN: sent message: %s\n",recv_buffer);
 					if(recv_buffer[0] == 'c'){
 						send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);
 					}

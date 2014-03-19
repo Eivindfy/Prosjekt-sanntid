@@ -16,8 +16,8 @@
 #include <unistd.h>
 
 #define PORT 33546
-#define HOST "129.241.187.158"
-#define MY_IP "129.241.187.158"
+#define HOST "129.241.187.143"
+#define MY_IP "129.241.187.143"
 #define MY_PORT 20000
 #define NUMBER_OF_CONNECTIONS 10
 #define BUFFER_SIZE 1024
@@ -46,12 +46,12 @@ void* server_client_comunication(void* spvoid){
 		timeout.tv_usec = 0;
 		FD_SET(intern_com, &communicationfd_set);
 		FD_SET(extern_com, &communicationfd_set);
-//		printf("SERVERCLIENT: Waiting on select fdmax = %d, intern_com = %d, extern_com = %d\n",fdmax,intern_com,extern_com);
+		printf("SERVERCLIENT: Waiting on select fdmax = %d, intern_com = %d, extern_com = %d\n",fdmax,intern_com,extern_com);
 		if(select(fdmax+1, &communicationfd_set, NULL, NULL, &timeout) <= 0 ){
 			printf("Error in select in server_client_comunication");
 //			return -1;
 		}
-//		printf("SERVERCLIENT: message recieved in server_client_comunilation\n");
+		printf("SERVERCLIENT: message recieved in server_client_comunilation\n");
 		for(int i = 0; i <= fdmax; i++){
 			if(FD_ISSET(i, &communicationfd_set)){
 //					printf("SERVERCLIENT: message recieved in server_client_comunilation: %d\n",i);
@@ -143,7 +143,7 @@ void *servermodule(void *module_sockfdvoid){
 
 	while(1){
 //		memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
-//		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
 		FD_SET(module_sockfd, &readfd_set);
@@ -161,7 +161,7 @@ void *servermodule(void *module_sockfdvoid){
 //		printf("SERVERCLIENT: select initiated\n");
 		for (int i = 0; i <= fdmax; i++){
 			if (FD_ISSET( i, &readfd_set)){
-//				printf("SERVERCLIENT: fd selected %d\n",i);
+				printf("SERVERCLIENT: fd selected %d\n",i);
 				if(i == serverfd) {
 //					printf("SERVERCLIENT: client conected\n");
 					newfd =  accept(serverfd, NULL, 0);
@@ -172,8 +172,8 @@ void *servermodule(void *module_sockfdvoid){
 					sp = &temp;
 					sp->intern_com = pair_of_sock[0];
 					sp->extern_com = newfd;
-//					printf("SERVERCLIENT: new socketfd %d\n", newfd);
-//					printf("SERVERCLIENT: local socketfd %d\n", pair_of_sock[1]);
+					printf("SERVERCLIENT: new socketfd %d\n", newfd);
+					printf("SERVERCLIENT: local socketfd %d\n", pair_of_sock[1]);
 					for(int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
 						if(intern_comunication_sockets[j] == 0){
 							intern_comunication_sockets[j] = pair_of_sock[1];
@@ -193,7 +193,7 @@ void *servermodule(void *module_sockfdvoid){
 					break;	
 				}
 				for( int j = 0; j < NUMBER_OF_CONNECTIONS; j++){
-//					printf("SERVERCLIENT: intern_comunication_sockets[j]= %d\n",intern_comunication_sockets[j]);
+					printf("SERVERCLIENT: intern_comunication_sockets[j]= %d\n",intern_comunication_sockets[j]);
 					if( i == intern_comunication_sockets[j]){
 						recv(i,buffer,sizeof(buffer),0);
 						if(insert_elevator_into_buffer(j,buffer)==-1){
@@ -285,3 +285,4 @@ int client_init(){
 	sleep(1);
 	return socket_pair[1];
 }
+

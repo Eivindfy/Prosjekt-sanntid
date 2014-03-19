@@ -69,7 +69,7 @@ void* button_return(void * socket_fd_void){
 
 		}
 		for (int i = 0; i < N_FLOORS; i++){
-			if(elev_get_button_signal(BUTTON_COMMAND, i) && !command_button[i]){
+			if(elev_get_button_signal(BUTTON_COMMAND, i) && !command_button[i] && i != elev_get_floor_sensor_signal() ){
 				send_buffer[0] = 'c';
 				insert_floor_into_buffer(i,send_buffer);
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);

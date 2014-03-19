@@ -18,13 +18,14 @@ int go_to_floor(int socketfd){
 		char send_buffer[1024];
 		if(global_current_floor < get_global_destination()){ // Sets the direction the elevator is travelling
 			elev_set_speed(300);
-			elev_set_door_open_lamp(0);
+//			elev_set_door_open_lamp(0);
+
 			global_direction = DIRECTION_UP;
 			printf("GO_TO_FLOOR: elev_set_speed(300)\n");
 		}
 		else if (global_current_floor > get_global_destination()){
 			elev_set_speed(-300);
-			elev_set_door_open_lamp(0);
+//			elev_set_door_open_lamp(0);
 			global_direction = DIRECTION_DOWN;
 			printf("GO_TO_FLOOR: elev_set_speed(300)\n");
 		}
@@ -50,21 +51,21 @@ int go_to_floor(int socketfd){
 			}
 			if(global_current_floor == get_global_destination()){
 				elev_set_speed(0);
-                send_buffer[0] = 'r';
-                insert_floor_into_buffer(global_current_floor, send_buffer);
-                send(socketfd,send_buffer,sizeof(send_buffer),0);
-                global_stop_array[global_current_floor] = 0;
+//				elev_set_door_open_lamp(1);
+				send_buffer[0] = 'r';
+				insert_floor_into_buffer(global_current_floor, send_buffer);
+			  	send(socketfd,send_buffer,sizeof(send_buffer),0);
+    		    global_stop_array[global_current_floor] = 0;
 				//global_direction = 0;
 				elev_set_button_lamp(BUTTON_COMMAND,global_current_floor,0);
-				elev_set_door_open_lamp(1);
 				return 0;
 			}
 			else if(global_stop_array[sensor_signal]){
 				elev_set_speed(0);
-				elev_set_door_open_lamp(1);
+//				elev_set_door_open_lamp(1);
 				elev_set_button_lamp(BUTTON_COMMAND,global_current_floor,0);
 				sleep(1);
-				elev_set_door_open_lamp(0);
+//				elev_set_door_open_lamp(0);
 				if(global_direction == DIRECTION_UP){
 					elev_set_speed(300);
 				}
@@ -112,14 +113,14 @@ void * elevator_control(void* socketfd_void){
 		global_current_floor = elev_get_floor_sensor_signal();
 	}
 	set_global_destination(global_current_floor);
-	elev_set_door_open_lamp(1);
+
 	// delete socketfd_void
 	printf("ELEVATOR_CONTROL: global_current_floor is %d\n",global_current_floor);
 	printf("ELEVATOR_CONTROL: global_direction is %d\n",global_direction);
   while(1){	
 		// check if someting is recieved
 		// set variable destination
-		usleep(100000);
+		
 //		printf("ELEVATOR_CONTROL: global_destination != global_current_floor = %i\n",global_destination != global_current_floor); 
 		while(get_global_destination() != global_current_floor || global_stop_array[global_current_floor]){
 			printf("ELEVATOR_CONTROL: going to floor %d\n",get_global_destination());
@@ -152,4 +153,3 @@ int elevator_control_init(){
 	pthread_create(&control_thread,NULL, elevator_control, dynamic_void_pointer);
 	return fd[1];
 }
-

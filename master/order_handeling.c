@@ -38,6 +38,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			case 'd':{ printf("HANDLE_MESSAGE: down button pressed\n");
 				int floor_number = get_floor_from_buffer(recv_buffer);
 				int order_given = 0;
+ 				printf("HANDLE_MESSAGE: N_ELEVATOR is %d\n",N_ELEVATOR);
 				for (int i = 0; i < N_ELEVATOR; i++){
 					if(elevator_status[i] == IDLE){
 						send_buffer[0] = 'R';
@@ -60,6 +61,12 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 				}
 				if(!order_given){
 					order_queue_insert(floor_number,BUTTON_DOWN);
+				}
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'D';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
 				}
 				break;
 			}
@@ -88,16 +95,73 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
     		if(!order_given){
 					order_queue_insert(floor_number,BUTTON_UP);
 			}
+			for (int i = 0; i < N_ELEVATOR; i++){
+				send_buffer[0] = 'U';
+				insert_floor_into_buffer(floor_number,send_buffer);
+				insert_elevator_into_buffer(i,send_buffer);
+				send(socketfd,send_buffer,sizeof(send_buffer),0);
+			}
 			break;
 		}
-		case 'r':{
+		case 'v':{
 			int elevator_number = get_elevator_from_buffer(recv_buffer);
 			int floor_number = get_floor_from_buffer(recv_buffer);
 			if(elevator_floor[elevator_number]<elevator_status[elevator_number]){
 				order_queue_remove(floor_number,UP);
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'A';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
+				}
 			}
 			else{
+				order_queue_remove(floor_number,DOWN);	
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'B';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
+				}
+			}
+			break;		 
+		}
+		case 'r':{
+//			int elevator_number = get_elevator_from_buffer(recv_buffer);
+			int floor_number = get_floor_from_buffer(recv_buffer);
+			if(floor_number == 0){
+				order_queue_remove(floor_number,UP);
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'A';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
+				}
+			}
+			else if(floor_number == N_FLOOR -1){
+				order_queue_remove(floor_number,DOWN);	
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'B';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
+				}
+			}
+			else{
+				order_queue_remove(floor_number,UP);
 				order_queue_remove(floor_number,DOWN);
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'B';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
+				}
+				for (int i = 0; i < N_ELEVATOR; i++){
+					send_buffer[0] = 'A';
+					insert_floor_into_buffer(floor_number,send_buffer);
+					insert_elevator_into_buffer(i,send_buffer);
+					send(socketfd,send_buffer,sizeof(send_buffer),0);
+				}
 			}
 			break;
 		}

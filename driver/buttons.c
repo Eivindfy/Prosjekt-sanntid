@@ -75,6 +75,7 @@ void* button_return(void * socket_fd_void){
 				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
 //				printf("BUTTONS: sent buffer %s to sockfd %d", send_buffer, socket_fd);
 				command_button[i] = 1;
+				elev_set_button_lamp(BUTTON_COMMAND,i,1);
 			}
 			else if(!elev_get_button_signal(BUTTON_COMMAND, i) && command_button[i]){
 				command_button[i] = 0;

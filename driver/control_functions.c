@@ -53,6 +53,7 @@ int go_to_floor(int socketfd){
         send(socketfd,send_buffer,sizeof(send_buffer),0);
         global_stop_array[global_current_floor] = 0;
 				//global_direction = 0;
+				elev_set_button_lamp(BUTTON_COMMAND,global_current_floor,0);
 				return 0;
 			}
 			else if(global_stop_array[sensor_signal]){
@@ -68,6 +69,7 @@ int go_to_floor(int socketfd){
 				insert_floor_into_buffer(global_current_floor, send_buffer);
 				send(socketfd,send_buffer,sizeof(send_buffer),0);
 				global_stop_array[global_current_floor] = 0;
+				elev_set_button_lamp(BUTTON_COMMAND,global_current_floor,0);
 			}
 			if(global_current_floor < get_global_destination() && global_direction == DIRECTION_DOWN){
 				return -1;

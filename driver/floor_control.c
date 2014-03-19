@@ -129,7 +129,7 @@ char send_buffer[1024];
 		}
 		else if(control_character == 'U'){
 			int floor_number = get_floor_from_buffer(receive_buffer);
-			elev_set_button_lamp(BUTTON_CALL_DOWN,floor_number,1);
+			elev_set_button_lamp(BUTTON_CALL_UP,floor_number,1);
 		}
 		else if(control_character == 'B'){
 			int floor_number = get_floor_from_buffer(receive_buffer);
@@ -137,7 +137,7 @@ char send_buffer[1024];
 		}
 		else if(control_character == 'A'){
 			int floor_number = get_floor_from_buffer(receive_buffer);
-			elev_set_button_lamp(BUTTON_CALL_DOWN,floor_number,0);
+			elev_set_button_lamp(BUTTON_CALL_UP,floor_number,0);
 		}
 
 	 }

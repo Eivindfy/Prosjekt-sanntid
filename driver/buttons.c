@@ -14,9 +14,9 @@ int button_init(){
 	
 
 	int* dynamic_int_pointer =  malloc(sizeof(*dynamic_int_pointer));
-   *dynamic_int_pointer = fd[0];
+	*dynamic_int_pointer = fd[0];
 	void* dynamic_void_pointer;
-   dynamic_void_pointer = (void*)dynamic_int_pointer;
+	dynamic_void_pointer = (void*)dynamic_int_pointer;
 	
 	pthread_t button_thread;
 
@@ -82,12 +82,12 @@ void* button_return(void * socket_fd_void){
 			}
 		}
 		if(elev_get_stop_signal()){
-				send_buffer[0] = 's';
-				send_buffer[1] = '-';
-				send_buffer[2] = '-';
-				send_buffer[3] = '-';
-				send_buffer[4] = '-';
-				send(socket_fd, send_buffer, sizeof(send_buffer), 0);
+			send_buffer[0] = 's';
+			send_buffer[1] = '-';
+			send_buffer[2] = '-';
+			send_buffer[3] = '-';
+			send_buffer[4] = '-';
+			send(socket_fd, send_buffer, sizeof(send_buffer), 0);
 		}
 
 

@@ -19,7 +19,7 @@ int write_backup(char* filename){
     fprintf(fp,"%d#%d#%d#%s#\n", doublevariabel, doublevariabel, osv)
     fclose(fp);
    
-    return 0;
+    return 1;
 }
 
 
@@ -58,5 +58,5 @@ int retrieve_backup(char* filename){
   
       
   fclose(fp);
-  return 0;
+  return 1;
 }

@@ -34,7 +34,7 @@ void * backup_module(void * socketfd_void){
 				break;
 			}
 		}
-		else{
+		else if(i == 4){
 				//this is master
 		}
 	}

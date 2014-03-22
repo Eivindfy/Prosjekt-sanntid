@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include "global_variables.h"
+#include <string.h>
 
 void * master_backup(void * socketfd_void){
 
@@ -29,12 +31,10 @@ void * master_backup(void * socketfd_void){
 	FD_ZERO(&socket_fd_set);
 
 	struct timeval timeout;
-	timeval.tv_sec = 3*60;
-	timeval.tv_usec = 0;
 
 	while(1){
-		timeval.tv_sec = 3*60;
-		timeval.tv_usec = 0;
+		timeval.tv_sec = 0;
+		timeval.tv_usec = 200000;
 		FD_SET(tcpsocketfd, &socket_fd_set);
 		FD_SET(udp_socketfd, &socket_fd_set);
 		select(fd_max + 1, &socket_fd_set, NULL, NULL, timeout);
@@ -50,19 +50,31 @@ void * master_backup(void * socketfd_void){
 							}
 						}
 						send_buffer[0] = 'm';
+						char * temp = MY_IP;
+						strcat(send_buffer, MY_IP);
 						send(udp_socket_fd, send_buffer, sizeof(send_buffer);
 					}
 				}
 				else if(i == tcp_socketfd){
 					if(recv_buffer[0] = 'a'){
 						int elev_number = get_elevator_from_buffer(recv_buffer);
-						elevator_alive_status[elev_number];
+						elevator_alive_status[elev_number] = 0;
 					}
 				}
 			}
-		}
+			else{
+				send_buffer[0] = 'A';
+				send(udp_socket_fd, send_buffer, sizeof(send_buffer));
+				for( int i = 0; i < N_ELEVATOR; i++){
+					if(elevator_alive_status[i] != -1){
+						elevator_alive_status[i]++; 
+					}
+					if( elevator_alive_status[i] == 5){
+						exit(0);
+					}
+				}
+			}
 	}
-
 }
 
 void * master_backup_init(){

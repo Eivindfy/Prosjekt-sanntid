@@ -1,0 +1,98 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "client_backup.h"
+#include "global_variables.h"
+
+
+
+
+int write_backup_client(char* filename){
+
+    FILE* fp;
+    fp = fopen(filename, "w");
+    
+    if (fp == NULL) {
+      printf("Error: couldn't open %s for writing in retreive_backup_client. \n",filename);
+      return -1;
+    }
+    fclose(fp);
+    
+    
+    fp = fopen(filename,"a");
+    
+	fprintf(fp,"$#%i#%i#%i#%i#$#", global_direction, global_current_floor, global_destination, global_idle);
+	
+	for(int i = 0 ; i < N_FLOORS ; i++){
+    	fprintf(fp,"%i#",global_stop_array[i]);  // bryr oss ikkje om den blir updated underveis, satser paa reset som ikkje kjem heile tida
+    }
+    
+   	fclose(fp);
+    return 1;
+}
+
+
+
+
+int retrieve_backup_client(char* filename){
+
+  FILE *fp;
+  char buffer[1024];
+  char* variable_string;
+  variable_string= NULL;
+   
+  fp = fopen(filename, "r");
+  if (fp == NULL) {
+    printf("Error: couldn't open %s for reading in retreive_backup_client.\n", filename);
+    return -1;
+  }
+  
+  
+  
+  if(fgets(buffer, sizeof(buffer), fp)!=NULL){
+  
+    variable_string = strtok( buffer, "#");
+    //printf("første variable_string: %s      \n",variable_string);
+    if(variable_string[0]!='$'){
+    	printf("Error: error in backup file %s when retreiving backup\n", filename); 
+    }
+    
+    
+    variable_string = strtok( NULL, "#");
+    global_direction = atoi(variable_string);
+    
+    variable_string = strtok( NULL, "#");
+    global_current_floor = atoi(variable_string);
+    
+    variable_string = strtok( NULL, "#");
+    global_destination = atoi(variable_string);
+    
+    variable_string = strtok( NULL, "#");
+    global_idle = atoi(variable_string);
+    
+    variable_string = strtok( NULL, "#");
+    if(variable_string[0]!='$'){
+    	printf("Error: faulty backup_file: file %s is corrupt",filename);
+    	return -1;
+    }
+    
+    int j = 0;
+    while(variable_string!=NULL){
+    
+    	variable_string = strtok( NULL, "#");
+    	global_stop_array[j]=atoi(variable_string);
+    	
+    	
+    	j=j+1;
+    	
+    	if(j > N_FLOORS){
+    		printf("Error: faulty backup_file: iterator int j bigger than N_FLOORS in backup file: %s \n",filename);
+    		return -1;
+    	}
+    }
+  }
+       
+  fclose(fp);
+  return 1;
+}

@@ -6,6 +6,6 @@ int write_backup_client(char* filename);
 
 int retrieve_backup_client(char* filename);
 
-int backup_tostring_client(char* filename, char* buffer,int size);
+int backup_tostring_client(char* filename, char* buffer);
 
 #endif

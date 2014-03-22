@@ -6,7 +6,7 @@ int write_backup_master(char* filename, int* elevator_status, int* elevator_floo
 
 int retrieve_backup_master(char* filename, int* elevator_status, int* elevator_floor, struct ORDER_QUEUE* root);
 
-int backup_tostring_master(char* filename, char* buffer, int size);
+int backup_tostring_master(char* filename, char* buffer);
 
 
 #endif

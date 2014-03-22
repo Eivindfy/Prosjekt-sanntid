@@ -33,6 +33,29 @@ int write_backup_client(char* filename){
 }
 
 
+int backup_tostring_client(char* filename, char* buffer, int size){
+
+  FILE* fp;
+  
+   
+  fp = fopen(filename, "r");
+  if (fp == NULL) {
+    printf("Error: couldn't open %s for reading in backup_tostring\n", filename);
+    return -1;
+  }
+  
+  
+  if(fgets(buffer, size, fp)!=NULL){
+  	fclose(fp);
+  	return 1;
+  }
+  else{
+  	printf("Error: error reading line in file %s in backup_tostr\n",filename);
+  	fclose(fp);
+  	return -1;
+  }
+  
+}
 
 
 int retrieve_backup_client(char* filename){
@@ -53,9 +76,11 @@ int retrieve_backup_client(char* filename){
   if(fgets(buffer, sizeof(buffer), fp)!=NULL){
   
     variable_string = strtok( buffer, "#");
-    printf("første variable_string: %s      \n",variable_string);
+    
     if(variable_string[0]!='$'){
     	printf("Error: error in backup file %s when retreiving backup\n", filename); 
+    	fclose(fp);
+    	return -1;
     }
     
     
@@ -74,6 +99,7 @@ int retrieve_backup_client(char* filename){
     variable_string = strtok( NULL, "#");
     if(variable_string[0]!='$'){
     	printf("Error: faulty backup_file: file %s is corrupt",filename);
+    	fclose(fp);
     	return -1;
     }
     
@@ -92,6 +118,7 @@ int retrieve_backup_client(char* filename){
     	
     	if(j > N_FLOORS){
     		printf("Error: faulty backup_file: iterator int j bigger than N_FLOORS in backup file: %s \n",filename);
+    		fclose(fp);
     		return -1;
     	}
     }

@@ -22,14 +22,24 @@ int main(){
 	global_stop_array[1]=2;
 	global_stop_array[2]=3;
 	global_stop_array[3]=-4;
+	char buffer[1024];
+	
 	
 	write_backup_client("/home/student/Prosjekt-sanntid/driver/testmappe/hei.txt");
+	
+	
+	backup_tostring_client("/home/student/Prosjekt-sanntid/driver/testmappe/hei.txt",buffer,sizeof(buffer));
+	
+	printf("dette er etter tostring: %s  \n",buffer);
+	
+	
 	
 	initialize_global_variables();
 	global_direction = -8;
 	global_idle = -8;
 	global_destination = -8;
 	global_current_floor = -8;
+	
 	
 	retrieve_backup_client("/home/student/Prosjekt-sanntid/driver/testmappe/hei.txt");
 	
@@ -38,6 +48,7 @@ int main(){
 	for(int i = 0 ; i < N_FLOORS ; i++){
     	printf("%i: %i\n",i,global_stop_array[i]);
     }
+    
 	
 	
 	

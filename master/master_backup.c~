@@ -45,7 +45,7 @@ int write_backup_master(char* filename, int* elevator_status, int* elevator_floo
 
 
 
-int backup_tostring(char* filename, char* buffer,int size){
+int backup_tostring(char* filename, char* buffer,size){
 
   FILE* fp;
    

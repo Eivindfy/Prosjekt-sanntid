@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "queue.h"
-#include "master_backup"
+#include "master_backup.h"
 #include "global_variables.h"
 
 

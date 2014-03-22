@@ -9,7 +9,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include "queue.h"
-#define N_ELEVATORS 2
+#define N_ELEVATORS 3
 #define N_FLOORS 4
 
 

@@ -19,7 +19,7 @@ int write_backup_master(char* filename){
     
     fp = fopen("filename","a");
     
-   git b
+   
    for
     fprintf(fp,"%d#%d#%d#%s#\n", doublevariabel, doublevariabel, osv)
     

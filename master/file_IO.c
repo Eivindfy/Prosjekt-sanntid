@@ -88,7 +88,7 @@ int retrieve_backup_master(char* filename, int* elevator_status, int* elevator_f
     	j=j+1;
     	
     	if(j > N_ELEVATORS){
-    		printf("Error: fauly backup_file: j bigger than N_ELEVATORS in backup file: %s \n",filename);
+    		printf("Error: faulty backup_file: iterator int j bigger than N_ELEVATORS in backup file: %s \n",filename);
     		return -1;
     	}
     }

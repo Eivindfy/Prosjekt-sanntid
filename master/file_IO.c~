@@ -2,25 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "queue.h"
 #include "file_IO.h"
 #include "global_variables.h"
 
 
 
 
-//kan ta inn fleire argument om ein treng det:
 int write_backup_master(char* filename, int* elevator_status, int* elevator_floor, struct ORDER_QUEUE* root){
+
     FILE* fp;
-
-    fp = fopen("filename", "w");
-
+    fp = fopen(filename, "w");
+    
     if (fp == NULL) {
-      printf("Error: couldn't open %s for writing\n",filename);
+      printf("Error: couldn't open %s for writing in retreive_backup_master. \n",filename);
       return -1;
     }
+    
     fclose(fp);
     
-    fp = fopen("filename","a");
+    
+    fp = fopen(filename,"a");
     
 	fprintf(fp,"$#");
 	for(int i = 0 ; i < N_ELEVATORS ; i++){
@@ -30,6 +32,7 @@ int write_backup_master(char* filename, int* elevator_status, int* elevator_floo
     
     struct ORDER_QUEUE* temp = root;
     
+    //ikkje modulaert, men dette er pga c ikkje er objektorientert, order_queue er ein pseudo-klasse. Les queue.h
     while(temp->next != NULL){
     	temp=temp->next;
     	fprintf(fp,"%i#%i#",temp->floor,temp->direction);
@@ -51,44 +54,73 @@ int retrieve_backup_master(char* filename, int* elevator_status, int* elevator_f
    
   fp = fopen(filename, "r");
   if (fp == NULL) {
-    printf("Error: couldn't open %s for reading.\n", filename);
+    printf("Error: couldn't open %s for reading in retreive_backup_master.\n", filename);
     return -1;
   }
   
   
   
-  if(gets(buffer, sizeof(buffer), fp)!=NULL){
+  if(fgets(buffer, sizeof(buffer), fp)!=NULL){
   
     variable_string = strtok( buffer, "#");
+    //printf("første variable_string: %s      \n",variable_string);
     if(variable_string[0]!='$'){
     	printf("Error: error in backup file %s when retreiving backup\n", filename); 
     }
-    strcpy(variable_string,"-1");
     
-    int linkedlist_check=0;
+    
     int j = 0;
     while(variable_string!=NULL){
     	variable_string = strtok( NULL, "#");
-    	if(variable_string=='$')
+    	if(variable_string[0]=='$'){
     		break;
-    	
+    	}
     	elevator_status[j]=atoi(variable_string);
+    	
     	
     	variable_string = strtok( NULL, "#");
-    	if(variable_string=='$')
+    	if(variable_string[0]=='$'){
     		break;
-    	elevator_status[j]=atoi(variable_string);
+    	}
+    	elevator_floor[j]=atoi(variable_string);
+    	
     	
     	j=j+1;
-    	if(j >= N_ELEVATORS){
-    		printf("Error: j bigger than N_ELEVATORS in backup file: %s \n",filename);
+    	
+    	if(j > N_ELEVATORS){
+    		printf("Error: faulty backup_file: j bigger than N_ELEVATORS in backup file: %s \n",filename);
     		return -1;
     	}
-    		
     }
     
-    //FLEIRE HEISAR?? FORTSETT I SLUTTEN TIL DU NÅR variable_string==NULL
-  
+    
+    
+
+    if(!order_queue_isempty()){
+    	order_queue_destroy();
+    	order_queue_initialize();
+    }
+    struct ORDER_QUEUE* temp=root;
+    
+    while(variable_string!=NULL){
+    	
+    	
+    	variable_string = strtok(NULL, "#");
+    	if(variable_string==NULL){
+    		break;
+    	}
+    	
+    	temp->next = (struct ORDER_QUEUE*) malloc(sizeof(struct ORDER_QUEUE));
+    	temp=temp->next;
+    	temp->next=NULL;
+    	
+    	temp->floor=atoi(variable_string);
+    	
+    	
+    	variable_string = strtok(NULL, "#");
+    	temp->direction = atoi(variable_string);
+    	
+    }
   }
        
   fclose(fp);

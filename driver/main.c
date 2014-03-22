@@ -10,14 +10,12 @@
 #include "tcpudpchannel.h"
 #include "global_variables.h"
 #include "utility_functions.h"
+#include "fault_tolerance.h"
 //#define NULL 0
 
 
 int main(){
 	int maxfd = 0;
-//	int udp_socketfd = tcpudpchannel_init();
-//	maxfd = udp_socketfd;
-// Maybe check if there is a master server here
 	initialize_global_variables();
 	mutex_init();
 	int tcp_socketfd = client_init();
@@ -29,6 +27,8 @@ int main(){
 	printf("MAIN: elevator control initiated\n");
 	int floor_control_socketfd = floor_control_init();
 	maxfd = floor_control_socketfd > maxfd ? floor_control_socketfd : maxfd;
+	int backup_module_socketfd = backup_module_init();
+	maxfd = backup_module_socketfd > maxfd ? backup_module_socketfd : maxfd;
 	printf("MAIN: floor control initiated\n");
 	printf("MAIN: global variables initiated\n");
 
@@ -38,26 +38,22 @@ int main(){
 	char recv_buffer[1024];
 	
 	while(1){
-//	  printf("MAIN: making socket set for tcp:%d\n", tcp_socketfd);
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
-//        FD_SET(udp_socketfd ,&socket_set);
  	  FD_SET(tcp_socketfd ,&socket_set);
-//		printf("MAIN: making socket set for button:%d\n", button_socketfd);
     FD_SET(button_socketfd ,&socket_set);
-//		printf("MAIN: making socket set for elevator control:%d\n", elevator_control_socketfd);
     FD_SET(elevator_control_socketfd ,&socket_set);
-//		printf("MAIN: making socket set for floor_control:%d\n", floor_control_socketfd);
 	  FD_SET(floor_control_socketfd ,&socket_set);
-//		printf("MAIN: waiting for select\n");
+		FD_SET(backup_module_socketfd ,&socket_set); 
+		
 		select(maxfd + 1, &socket_set, NULL, NULL, &timeout);
 		printf("MAIN: select initiated\n");
 		for( int i = 0; i <= maxfd; i ++){
 			if(FD_ISSET(i,&socket_set)){
-//				if(i == udp_socketfd){
-//					recv(i,recv_buffer,sizeof(recv_buffer),0);
-//				}
-				if(i == tcp_socketfd){
+				if(i == backup_module_socketfd){
+					recv(i,recv_buffer,sizeof(recv_buffer),0);
+				}
+				else if(i == tcp_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					printf("MAIN: recieved message from master: %s\n",recv_buffer);
 					send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);

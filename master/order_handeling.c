@@ -12,7 +12,7 @@
 #define BUTTON_PENDING 4
 #define BUTTON_NONE 0
 #define N_FLOOR 4
-#define N_ELEVATOR 2
+#define N_ELEVATOR 3
 
 // Hvis ingen heiser er ledige, vent til ein er ledig
 

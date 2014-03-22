@@ -8,12 +8,12 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <errno.h>
-
+#include "global_variables.h"
 #include "tcpudpchannel.h"
 
 
 // erstatt desse her med ei headerfil med  definisjonar eller noko
-#define UDPADDRESS "129.241.187.158"
+#define UDPADDRESS "129.241.187.255"
 #define UDPPORT 12345
 #define TCPADDRESS "127.0.0.1"
 #define TCPPORT 12435
@@ -71,6 +71,7 @@ struct sockaddr_in udp_socket_address;
 
 
 struct in_addr udp_address;
+
 if(inet_pton(AF_INET,UDPADDRESS,&udp_address)<=0){
 	perror("failure assigning UDP address in tcpudpchannel\n");
 }
@@ -95,7 +96,7 @@ if ( rc <0 )
 
 rc = bind(udp_socketfd, (struct sockaddr*)&udp_socket_address, udp_address_length);
 if( rc < 0)
-    perror("Error binding udp socketn\n");
+    printf("Error binding udp socketn: %s\n",strerror(errno));
 
 // ------------------ receiving from tcp --------------------
 
@@ -117,8 +118,12 @@ tv.tv_usec = 0;
 
 
 while(1){
-	select(fd_max+1,&master_set,NULL,NULL,&tv);
-    
+	FD_SET(udp_socketfd,&master_set);
+	FD_SET(tcp_socketfd,&master_set);
+	tv.tv_sec = 100;
+	tv.tv_usec = 0;
+	int rc = select(fd_max+1,&master_set,NULL,NULL,&tv);
+  printf("TCPUDPCHANNEL: rc =%d\n",rc);
 	if( FD_ISSET(tcp_socketfd,&master_set)){
         
         
@@ -130,21 +135,21 @@ while(1){
 		
         
        
-		transferstatus=sendto(udp_socketfd,buffer,sizeof(buffer),0,(struct 			 			sockaddr*)&udp_socket_address,udp_address_length);
+		transferstatus=sendto(udp_socketfd,buffer,sizeof(buffer),0,(struct sockaddr*)&udp_socket_address,udp_address_length);
 		
 		if (transferstatus<0){
 			perror("Failure sending to UDP in tcpudpchannel\n");
 	    }
-	    
 
+//		printf("TCPUDPCHANNEL: sent message: %s \n",buffer);
 	}
 
-	else if( FD_ISSET(udp_socketfd,&master_set)){
+	if( FD_ISSET(udp_socketfd,&master_set)){
 	
 
 
         
-		transferstatus=recvfrom(udp_socketfd,buffer,sizeof(buffer),0,(struct 					  sockaddr*)&udp_socket_address, &udp_address_length);
+		transferstatus=recvfrom(udp_socketfd,buffer,sizeof(buffer),0,(struct sockaddr*)&udp_socket_address, &udp_address_length);
 		
 		if ( transferstatus < 0 ){
 			perror("Failure receiving from UDP in tcpudpchannel\n");
@@ -159,7 +164,7 @@ while(1){
 		if( transferstatus < 0 ){
 			perror("Failure sending to TCP in tcpudpchannel\n");
 		}
- 
+		printf("TCPUDPCHANNEL: received message : %s\n",buffer);
 	}
 }
 }

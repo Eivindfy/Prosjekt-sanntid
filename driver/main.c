@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "buttons.h"
 #include "serverclient.h"
 #include "control_functions.h"
@@ -17,6 +18,11 @@
 int main(){
 	int maxfd = 0;
 	initialize_global_variables();
+
+	int backup_module_socketfd = backup_module_init();
+	maxfd = backup_module_socketfd > maxfd ? backup_module_socketfd : maxfd;
+
+
 	mutex_init();
 	int tcp_socketfd = client_init();
 	maxfd = tcp_socketfd > maxfd ? tcp_socketfd : maxfd;
@@ -27,8 +33,6 @@ int main(){
 	printf("MAIN: elevator control initiated\n");
 	int floor_control_socketfd = floor_control_init();
 	maxfd = floor_control_socketfd > maxfd ? floor_control_socketfd : maxfd;
-	int backup_module_socketfd = backup_module_init();
-	maxfd = backup_module_socketfd > maxfd ? backup_module_socketfd : maxfd;
 	printf("MAIN: floor control initiated\n");
 	printf("MAIN: global variables initiated\n");
 
@@ -52,6 +56,7 @@ int main(){
 			if(FD_ISSET(i,&socket_set)){
 				if(i == backup_module_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
+					send(tcp_socketfd, recv_buffer, sizeof(recv_buffer),0);
 				}
 				else if(i == tcp_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);

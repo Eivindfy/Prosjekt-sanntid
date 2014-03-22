@@ -1,1 +1,1 @@
-tcpudpchannel.o: tcpudpchannel.c tcpudpchannel.h
+tcpudpchannel.o: tcpudpchannel.c global_variables.h tcpudpchannel.h

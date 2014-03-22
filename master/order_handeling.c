@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include "utility_functions.h"
 #include "queue.h"
+#include "global_variables.h"
 #define IDLE  -1
 #define DOWN  1
 #define UP  2
@@ -11,8 +12,7 @@
 #define BUTTON_BOTH 3
 #define BUTTON_PENDING 4
 #define BUTTON_NONE 0
-#define N_FLOOR 4
-#define N_ELEVATOR 3
+
 
 // Hvis ingen heiser er ledige, vent til ein er ledig
 
@@ -38,8 +38,8 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			case 'd':{ printf("HANDLE_MESSAGE: down button pressed\n");
 				int floor_number = get_floor_from_buffer(recv_buffer);
 				int order_given = 0;
- 				printf("HANDLE_MESSAGE: N_ELEVATOR is %d\n",N_ELEVATOR);
-				for (int i = 0; i < N_ELEVATOR; i++){
+ 				printf("HANDLE_MESSAGE: N_ELEVATORS is %d\n",N_ELEVATORS);
+				for (int i = 0; i < N_ELEVATORS; i++){
 					if(elevator_status[i] == IDLE){
 						send_buffer[0] = 'R';
 						insert_floor_into_buffer(floor_number,send_buffer);
@@ -62,7 +62,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 				if(!order_given){
 					order_queue_insert(floor_number,BUTTON_DOWN);
 				}
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'D';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);
@@ -73,7 +73,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			case 'u':{
 				int floor_number = get_floor_from_buffer(recv_buffer);
 				int order_given = 0;
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					if(elevator_status[i] == IDLE){
 						send_buffer[0] = 'R';
 						insert_floor_into_buffer(floor_number,send_buffer);
@@ -95,7 +95,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
     		if(!order_given){
 					order_queue_insert(floor_number,BUTTON_UP);
 			}
-			for (int i = 0; i < N_ELEVATOR; i++){
+			for (int i = 0; i < N_ELEVATORS; i++){
 				send_buffer[0] = 'U';
 				insert_floor_into_buffer(floor_number,send_buffer);
 				insert_elevator_into_buffer(i,send_buffer);
@@ -108,7 +108,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			int floor_number = get_floor_from_buffer(recv_buffer);
 			if(elevator_floor[elevator_number]<elevator_status[elevator_number]){
 				order_queue_remove(floor_number,UP);
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'A';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);
@@ -117,7 +117,7 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			}
 			else{
 				order_queue_remove(floor_number,DOWN);	
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'B';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);
@@ -131,16 +131,16 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			int floor_number = get_floor_from_buffer(recv_buffer);
 			if(floor_number == 0){
 				order_queue_remove(floor_number,UP);
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'A';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);
 					send(socketfd,send_buffer,sizeof(send_buffer),0);
 				}
 			}
-			else if(floor_number == N_FLOOR -1){
+			else if(floor_number == N_FLOORS -1){
 				order_queue_remove(floor_number,DOWN);	
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'B';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);
@@ -150,13 +150,13 @@ int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,s
 			else{
 				order_queue_remove(floor_number,UP);
 				order_queue_remove(floor_number,DOWN);
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'B';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);
 					send(socketfd,send_buffer,sizeof(send_buffer),0);
 				}
-				for (int i = 0; i < N_ELEVATOR; i++){
+				for (int i = 0; i < N_ELEVATORS; i++){
 					send_buffer[0] = 'A';
 					insert_floor_into_buffer(floor_number,send_buffer);
 					insert_elevator_into_buffer(i,send_buffer);

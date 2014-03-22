@@ -6,6 +6,7 @@
 
 #define DIRECTION_UP 1
 #define DIRECTION_DOWN -1
+#define MY_IP "129.241.187.161"
 
 #define GLOBAL_VARIABLES_H
 #ifdef  MAIN_FILE

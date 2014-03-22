@@ -1,29 +1,42 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+#include "queue.h"
 #include "file_IO.h"
+#include "global_variables.h"
 
 
 
 
-//kan ta inn fleire argument om ein treng det:
-int write_backup_master(char* filename){
+int write_backup_master(char* filename, int* elevator_status, int* elevator_floor, struct ORDER_QUEUE* root){
+
     FILE* fp;
-
-    fp = fopen("filename", "w");
-
+    fp = fopen(filename, "w");
+    
     if (fp == NULL) {
-      printf("Error: couldn't open %s \n",filename);
+      printf("Error: couldn't open %s for writing in retreive_backup_master. \n",filename);
       return -1;
     }
+    
     fclose(fp);
     
-    fp = fopen("filename","a");
     
-   git b
-   for
-    fprintf(fp,"%d#%d#%d#%s#\n", doublevariabel, doublevariabel, osv)
+    fp = fopen(filename,"a");
     
+	fprintf(fp,"$#");
+	for(int i = 0 ; i < N_ELEVATORS ; i++){
+    	fprintf(fp,"%i#%i#",elevator_status[i],elevator_floor[i]);
+    }
+    fprintf(fp,"$#");
     
+    struct ORDER_QUEUE* temp = root;
+    
+    //ikkje modulaert, men dette er pga c ikkje er objektorientert, order_queue er ein pseudo-klasse. Les queue.h
+    while(temp->next != NULL){
+    	temp=temp->next;
+    	fprintf(fp,"%i#%i#",temp->floor,temp->direction);
+    }
     fclose(fp);
    
     return 1;
@@ -32,7 +45,7 @@ int write_backup_master(char* filename){
 
 
 
-int retrieve_backup_master(char* filename){
+int retrieve_backup_master(char* filename, int* elevator_status, int* elevator_floor, struct ORDER_QUEUE* root){
 
   FILE *fp;
   char buffer[1024];
@@ -41,29 +54,75 @@ int retrieve_backup_master(char* filename){
    
   fp = fopen(filename, "r");
   if (fp == NULL) {
-    printf("I couldn't open %s for reading.\n", filename);
+    printf("Error: couldn't open %s for reading in retreive_backup_master.\n", filename);
     return -1;
   }
   
-  if(gets(buffer, sizeof(buffer), fp)!=NULL){
+  
+  
+  if(fgets(buffer, sizeof(buffer), fp)!=NULL){
+  
     variable_string = strtok( buffer, "#");
-    //gjer noko med første variabel
-    
-    variable_string = strtok( NULL, "#");
-    //gjer noko med andre variabel
-    
-    variable_string = strtok( NULL, "#");
-    //tredje variabel osv, veit ikkje kvifor NULL fungerer som input
+    //printf("første variable_string: %s      \n",variable_string);
+    if(variable_string[0]!='$'){
+    	printf("Error: error in backup file %s when retreiving backup\n", filename); 
+    }
     
     
-    //FLEIRE HEISAR?? FORTSETT I SLUTTEN TIL DU NÅR variable_string==NULL
-  
+    int j = 0;
+    while(variable_string!=NULL){
+    	variable_string = strtok( NULL, "#");
+    	if(variable_string[0]=='$'){
+    		break;
+    	}
+    	elevator_status[j]=atoi(variable_string);
+    	
+    	
+    	variable_string = strtok( NULL, "#");
+    	if(variable_string[0]=='$'){
+    		break;
+    	}
+    	elevator_floor[j]=atoi(variable_string);
+    	
+    	
+    	j=j+1;
+    	
+    	if(j > N_ELEVATORS){
+    		printf("Error: fauly backup_file: j bigger than N_ELEVATORS in backup file: %s \n",filename);
+    		return -1;
+    	}
+    }
+    
+    
+    
+
+    if(!order_queue_isempty()){
+    	order_queue_destroy();
+    	order_queue_initialize();
+    }
+    struct ORDER_QUEUE* temp=root;
+    
+    while(variable_string!=NULL){
+    	
+    	
+    	variable_string = strtok(NULL, "#");
+    	if(variable_string==NULL){
+    		break;
+    	}
+    	
+    	temp->next = (struct ORDER_QUEUE*) malloc(sizeof(struct ORDER_QUEUE));
+    	temp=temp->next;
+    	temp->next=NULL;
+    	
+    	temp->floor=atoi(variable_string);
+    	
+    	
+    	variable_string = strtok(NULL, "#");
+    	temp->direction = atoi(variable_string);
+    	
+    }
   }
-  
-  
-  
-  
-      
+       
   fclose(fp);
   return 1;
 }

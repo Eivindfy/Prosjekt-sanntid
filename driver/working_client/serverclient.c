@@ -16,8 +16,8 @@
 #include <unistd.h>
 
 #define PORT 33546
-#define HOST "129.241.187.143"
-#define MY_IP "129.241.187.143"
+#define HOST "129.241.187.156"
+#define MY_IP "129.241.187.156"
 #define MY_PORT 20000
 #define NUMBER_OF_CONNECTIONS 10
 #define BUFFER_SIZE 1024

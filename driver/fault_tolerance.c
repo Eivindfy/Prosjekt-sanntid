@@ -4,10 +4,20 @@
 #include "utility_functions.h"
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <arpa/inet.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include "global_variables.h"
 #include "fault_tolerance.h"
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+
+
+#define WATCHDOGHOST "127.0.0.1"
+#define WATCHDOGPORT 25000
+
+
 
 void * backup_module(void * socketfd_void){
 	int tcpsocketfd = *(int*) socketfd_void;
@@ -17,6 +27,7 @@ void * backup_module(void * socketfd_void){
 	char recv_buffer[1024];
 	send_buffer[0] = 'i';  // initialized 
 	fd_set udp_fd_set;
+	watchdog_spamer_init();
 	FD_ZERO(&udp_fd_set);
 	struct timeval timeout;
 	for(int i = 0; i <10; i++){
@@ -29,7 +40,16 @@ void * backup_module(void * socketfd_void){
 			recv(udp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
 //			printf("FAULT_TOLERANCE: recieved message: %s\n", recv_buffer);
 			if(recv_buffer[0] == 'm'){
+				char temp[1024];
 				printf("FAULT_TOLERANCE: master found\n");
+				for(int j = 1; recv_buffer[j-1] != '\0';j++){
+//					printf("global_host_ip = %s , j = %d \n",temp, j);
+
+					temp[j-1]= recv_buffer[j];
+					temp[j] ='\0';
+				}
+				global_host_ip = temp;
+				printf("global_host_ip = %s\n",global_host_ip);
 				break;
 			}
 		}
@@ -45,7 +65,7 @@ void * backup_module(void * socketfd_void){
 	while(1){
 		FD_SET(udp_socketfd,&udp_fd_set);
 		timeout.tv_sec = 0;
-		timeout.tv_usec = 100000;
+		timeout.tv_usec = 1000000;
 //		printf("FAULT_TOLERANCE: waiting on master \n");
 		select(udp_socketfd+1, &udp_fd_set, NULL, NULL, &timeout);
 		if(FD_ISSET(udp_socketfd, &udp_fd_set)){
@@ -88,4 +108,59 @@ int backup_module_init(){
 
 	return fd[1];
 
+}
+
+int watchdog_spamer_init(){
+
+	pthread_t watchdog_spam;
+
+	pthread_create(&watchdog_spam,NULL, watchdog_spamer, NULL);
+
+	return 1;
+}
+
+void * watchdog_spamer(){
+	
+	struct sockaddr_in *server_addr;
+	struct sockaddr_in temp;
+	server_addr = &temp;
+	int socketfd;
+	char buffer[1024];
+
+	socketfd = socket(AF_INET, SOCK_DGRAM,0);
+	if(socketfd== -1){
+		printf("error opening socket\n");
+		exit(1);
+	}									
+	struct in_addr host_addr;
+	if(inet_pton(AF_INET, WATCHDOGHOST,&host_addr) <=0){
+		printf("error\n");
+		exit(1);
+	} 	
+	server_addr->sin_port = htons(WATCHDOGPORT);
+	server_addr->sin_addr = host_addr; 
+	server_addr->sin_family = AF_INET;
+	int yes = 1;
+
+	if(setsockopt(socketfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(yes)) ==-1){
+		printf("Error setting socket as readable: %i\n", errno);
+		exit(1);
+	}
+
+
+	
+	if(bind(socketfd, (struct sockaddr *) server_addr, sizeof(*server_addr)) < 0){
+		printf("Error in bind. %s \n", strerror(errno));
+		exit(1);
+	}
+	buffer[0] = 'W';
+	buffer[1] = '\0';	
+	system("mate-terminal -e ./watchdog/watchdog");
+	socklen_t addrlen = sizeof(*server_addr);
+//	printf("WATCHDOGSPAMMER: start sending");
+	while(1){
+		usleep(100000);
+		sendto(socketfd, buffer, 1024, 0, (struct sockaddr *) server_addr, addrlen);
+//		printf("WATCHDOGSPAMMER: sent message %s\n",buffer);
+	}
 }

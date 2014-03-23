@@ -19,6 +19,7 @@
 
 int handle_message(char* recv_buffer ,int *elevator_status,int *elevator_floor,struct ORDER_QUEUE *floor_status, int socketfd){ 
 	char send_buffer[1024];
+//	printf("ORDER_HANDELING: recv_buffer = %s\n",recv_buffer);
 		switch (recv_buffer[0]){
 			case 'I':{
 				int elevator_number = get_elevator_from_buffer(recv_buffer);

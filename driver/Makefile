@@ -5,7 +5,7 @@ CFLAGS = -std=c99 -g -Wall -O2 -I . -MMD
 LDFLAGS = -lpthread -lcomedi -g -lm
 
 # list of sources
-ELEVSRC = elev.c io.c main.c buttons.c control_functions.c  serverclient.c tcpudpchannel.c utility_functions.c global_variables.c floor_control.c fault_tolerance.c
+ELEVSRC = elev.c io.c main.c buttons.c control_functions.c  serverclient.c tcpudpchannel.c utility_functions.c global_variables.c floor_control.c fault_tolerance.c client_backup.o
 
 # program executable file name.
 TARGET = lift

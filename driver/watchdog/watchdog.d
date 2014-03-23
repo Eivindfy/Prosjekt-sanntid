@@ -1,0 +1,1 @@
+watchdog.o: watchdog.c

@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 #include "buttons.h"
 #include "serverclient.h"
 #include "control_functions.h"
@@ -12,6 +13,7 @@
 #include "global_variables.h"
 #include "utility_functions.h"
 #include "fault_tolerance.h"
+#include "client_backup.h"
 //#define NULL 0
 
 
@@ -22,7 +24,8 @@ int main(){
 	int backup_module_socketfd = backup_module_init();
 	maxfd = backup_module_socketfd > maxfd ? backup_module_socketfd : maxfd;
 
-
+	sleep(1);
+//	printf("MAIN: initializing tcp\n");
 	mutex_init();
 	int tcp_socketfd = client_init();
 	maxfd = tcp_socketfd > maxfd ? tcp_socketfd : maxfd;
@@ -35,12 +38,14 @@ int main(){
 	maxfd = floor_control_socketfd > maxfd ? floor_control_socketfd : maxfd;
 	printf("MAIN: floor control initiated\n");
 	printf("MAIN: global variables initiated\n");
-
+	
 	fd_set socket_set;
 	FD_ZERO(&socket_set);
 	struct timeval timeout;
 	char recv_buffer[1024];
-	
+//	retrieve_backup_client("client_backup.txt");
+	char filename[1024];
+
 	while(1){
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
@@ -60,11 +65,23 @@ int main(){
 				}
 				else if(i == tcp_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
+					if(recv_buffer[0] == '$'){
+//						FILE* fp;
+//						strcpy(filename, "master_backup.txt");
+//						fp = fopen(filename, "w");
+//						if (fp == NULL) {
+//						    	printf("Error: couldn't open %s for writing in client main \n",filename);
+//							return -1;
+//						}
+//						fprintf(fp,"%s",recv_buffer);
+					}
 //					printf("MAIN: recieved message from master: %s\n",recv_buffer);
-					send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);
+					else{
+						send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);
+					}
 				}
 				else if(i == button_socketfd){
-     			   recv(i,recv_buffer,sizeof(recv_buffer),0);
+ 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
 					printf("MAIN: sent message: %s\n",recv_buffer);
 					if(recv_buffer[0] == 'c'){
@@ -84,9 +101,10 @@ int main(){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
 					send(tcp_socketfd,recv_buffer,sizeof(recv_buffer),0);
 					printf("MAIN: sent message to master: %s\n",recv_buffer);
-          }
+				}
 			}
 		}
+//		write_backup_client("client_backup.txt");
 	}
     return 0;
 }

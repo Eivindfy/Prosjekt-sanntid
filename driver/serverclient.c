@@ -14,6 +14,7 @@
 #include <math.h>
 #include "utility_functions.h"
 #include <unistd.h>
+#include "global_variables.h"
 
 #define PORT 33546
 #define HOST "129.241.187.156"
@@ -64,8 +65,10 @@ void* server_client_comunication(void* spvoid){
 						if(recv(extern_com, message, sizeof(message),0)<0){
 							printf("SERVERCLIENT: error recieving %s\n",strerror(errno));
 						}
-
-						if(send(intern_com, message, sizeof(message),0)<0){
+						else if(recv(extern_com, message, sizeof(message),0)==0){
+						
+						}
+						else if(send(intern_com, message, sizeof(message),0)<0){
 							printf("SERVERCLIENT: error sending %s\n",strerror(errno));
 						}
 					}
@@ -138,12 +141,12 @@ void *servermodule(void *module_sockfdvoid){
 	FD_SET(serverfd, &readfd_set);
 	FD_SET(module_sockfd, &readfd_set);
 	
-//	printf("SERVERCLIENT: setup complete: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+	printf("SERVERCLIENT: setup complete: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
 //	memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
 
 	while(1){
 //		memcpy(&readfd_set, &masterfd_set, sizeof(masterfd_set));
-//		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
+		printf("SERVERCLIENT: waiting for select: fdmax = %d , module_sockfd = %d\n",fdmax,module_sockfd);
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
 		FD_SET(module_sockfd, &readfd_set);
@@ -259,7 +262,7 @@ int client_init(){
 	}
 	
 	struct in_addr host_addr;
-	if(inet_pton(AF_INET, HOST,&host_addr) <=0){
+	if(inet_pton(AF_INET, MY_IP,&host_addr) <=0){
 		printf("error creating host address");
 		return -1;
 	} 	

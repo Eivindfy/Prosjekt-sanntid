@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "queue.h"
 #include "fault_tolerance_master.h"
+#include "master_backup.h"
 
 
 
@@ -31,8 +32,9 @@ int main (){
 	struct timeval timeout;
 	char recv_buffer[1024];
 	char send_buffer[1024];
-
+	global_host_ip = MY_IP;
 	order_queue_initialize();
+	retrieve_backup_master("master_backup.txt",elevator_status,elevator_floor,root);
 	
 	while(1){
 		timeout.tv_sec = 3*60;
@@ -43,9 +45,8 @@ int main (){
 		for(int i = 0; i <= maxfd; i++){
 			if(FD_ISSET(i, &socket_set)){
 				if(i == tcp_socketfd){
-//					printf("MAIN: recieving message\n ");	
 					recv(tcp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
-
+					printf("MAIN: recieved message: %s\n ",recv_buffer);
 					if(recv_buffer[0] == 'a'|| recv_buffer[0] == 'i'){
 						send(master_backupfd, recv_buffer, sizeof(recv_buffer),0);
 					}
@@ -56,6 +57,9 @@ int main (){
 				}
 			}
 		}
+		write_backup_master("master_backup.txt",elevator_status,elevator_floor,root);
+		backup_tostring("master_backup.txt", send_buffer, sizeof(send_buffer));
+//		send(tcp_socketfd,send_buffer,sizeof(recv_buffer), 0);
 	}
 }
 

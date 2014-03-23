@@ -50,10 +50,10 @@ int go_to_floor(int socketfd){
 			}
 			if(global_current_floor == get_global_destination()){
 				elev_set_speed(0);
-                send_buffer[0] = 'r';
-                insert_floor_into_buffer(global_current_floor, send_buffer);
-                send(socketfd,send_buffer,sizeof(send_buffer),0);
-                global_stop_array[global_current_floor] = 0;
+				send_buffer[0] = 'r';
+				insert_floor_into_buffer(global_current_floor, send_buffer);
+				send(socketfd,send_buffer,sizeof(send_buffer),0);
+				global_stop_array[global_current_floor] = 0;
 				//global_direction = 0;
 				elev_set_button_lamp(BUTTON_COMMAND,global_current_floor,0);
 				elev_set_door_open_lamp(1);
@@ -101,7 +101,7 @@ void * elevator_control(void* socketfd_void){
 	int socketfd = * (int* ) socketfd_void;
 	char send_buffer[1024];
 	elev_set_speed(0);
-	if(global_current_floor == -1){
+	if(global_current_floor != 1){
 		elev_set_speed(-300);
 		printf("ELEVATOR_CONTROL: elev_set_speed(-300)\n");
 		while(elev_get_floor_sensor_signal()!=0){
@@ -116,7 +116,7 @@ void * elevator_control(void* socketfd_void){
 	// delete socketfd_void
 	printf("ELEVATOR_CONTROL: global_current_floor is %d\n",global_current_floor);
 	printf("ELEVATOR_CONTROL: global_direction is %d\n",global_direction);
-  while(1){	
+	while(1){	
 		// check if someting is recieved
 		// set variable destination
 		usleep(100000);

@@ -47,7 +47,7 @@ void * master_backup(void * socketfd_void){
 
 	while(1){
 		timeout.tv_sec = 0;
-		timeout.tv_usec = 100000;
+		timeout.tv_usec = 1000000;
 		FD_SET(tcpsocketfd, &socket_fd_set);
 //		printf("FAULT_TOLERANCE_MASTER: tcpsocketfd: %d udp_socketfd: %d fd_max: %d \n", tcpsocketfd,udp_socketfd,fd_max);
 		select(fd_max + 1, &socket_fd_set, NULL, NULL, &timeout);
@@ -107,6 +107,7 @@ void * alivespam(void * ap){
 //				printf("%d\n",elevator_alive_status[i]);
 			}
 			if( elevator_alive_status[i] == 5){
+				printf("FAULT_TOLERANCE_MASTER: elevator died \n");
 				exit(0);
 			}
 		}
@@ -117,6 +118,6 @@ void * alivespam(void * ap){
 		strcat(send_buffer, temp);
 		send(udp_socketfd, send_buffer, sizeof(send_buffer), 0);
 //		printf("FAULT_TOLERANCE_MASTER: Sent %s \n", send_buffer);
-		usleep(100000);
+		usleep(1000000);
 	}
 }

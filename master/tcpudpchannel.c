@@ -13,8 +13,8 @@
 
 
 // erstatt desse her med ei headerfil med  definisjonar eller noko
-#define UDPADDRESS "129.241.187.255"
-#define UDPPORT 12345
+#define UDPADDRESS "129.241.187.156"
+#define UDPPORT 22345
 #define TCPADDRESS "127.0.0.1"
 #define TCPPORT 12435
 #define BUFFERLENGTH 1024
@@ -118,12 +118,14 @@ tv.tv_usec = 0;
 
 
 while(1){
+//	printf("TCPUDPCHANNEL: waiting on select\n");
 	FD_SET(udp_socketfd,&master_set);
 	FD_SET(tcp_socketfd,&master_set);
 	tv.tv_sec = 100;
 	tv.tv_usec = 0;
 	int rc = select(fd_max+1,&master_set,NULL,NULL,&tv);
-  printf("TCPUDPCHANNEL: rc =%d\n",rc);
+//	printf("TCPUDPCHANNEL: rc =%d\n",rc);
+	socklen_t udp_address_length = sizeof(udp_socket_address);	
 	if( FD_ISSET(tcp_socketfd,&master_set)){
         
         
@@ -164,7 +166,7 @@ while(1){
 		if( transferstatus < 0 ){
 			perror("Failure sending to TCP in tcpudpchannel\n");
 		}
-		printf("TCPUDPCHANNEL: received message : %s\n",buffer);
+//		printf("TCPUDPCHANNEL: received message : %s\n",buffer);
 	}
 }
 }

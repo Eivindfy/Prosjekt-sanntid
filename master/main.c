@@ -45,8 +45,9 @@ int main (){
 				if(i == tcp_socketfd){
 //					printf("MAIN: recieving message\n ");	
 					recv(tcp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
+
 					if(recv_buffer[0] == 'a'|| recv_buffer[0] == 'i'){
-						send(master_backupfd, send_buffer, sizeof(send_buffer),0);
+						send(master_backupfd, recv_buffer, sizeof(recv_buffer),0);
 					}
 					else{
 //						printf("MAIN: recived message: %s\n ",recv_buffer);

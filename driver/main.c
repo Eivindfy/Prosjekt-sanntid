@@ -44,14 +44,14 @@ int main(){
 	while(1){
 		timeout.tv_sec = 3*60;
 		timeout.tv_usec = 0;
- 	  FD_SET(tcp_socketfd ,&socket_set);
-    FD_SET(button_socketfd ,&socket_set);
-    FD_SET(elevator_control_socketfd ,&socket_set);
-	  FD_SET(floor_control_socketfd ,&socket_set);
+		FD_SET(tcp_socketfd ,&socket_set);
+		FD_SET(button_socketfd ,&socket_set);
+		FD_SET(elevator_control_socketfd ,&socket_set);
+		FD_SET(floor_control_socketfd ,&socket_set);
 		FD_SET(backup_module_socketfd ,&socket_set); 
 		
 		select(maxfd + 1, &socket_set, NULL, NULL, &timeout);
-		printf("MAIN: select initiated\n");
+//		printf("MAIN: select initiated\n");
 		for( int i = 0; i <= maxfd; i ++){
 			if(FD_ISSET(i,&socket_set)){
 				if(i == backup_module_socketfd){
@@ -60,7 +60,7 @@ int main(){
 				}
 				else if(i == tcp_socketfd){
 					recv(i,recv_buffer,sizeof(recv_buffer),0);
-					printf("MAIN: recieved message from master: %s\n",recv_buffer);
+//					printf("MAIN: recieved message from master: %s\n",recv_buffer);
 					send(floor_control_socketfd,recv_buffer,sizeof(recv_buffer),0);
 				}
 				else if(i == button_socketfd){

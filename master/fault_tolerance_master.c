@@ -47,20 +47,20 @@ void * master_backup(void * socketfd_void){
 
 	while(1){
 		timeout.tv_sec = 0;
-		timeout.tv_usec = 500000;
+		timeout.tv_usec = 100000;
 		FD_SET(tcpsocketfd, &socket_fd_set);
 //		printf("FAULT_TOLERANCE_MASTER: tcpsocketfd: %d udp_socketfd: %d fd_max: %d \n", tcpsocketfd,udp_socketfd,fd_max);
 		select(fd_max + 1, &socket_fd_set, NULL, NULL, &timeout);
 		for(int i = 0; i <= fd_max; i++){
 			if(FD_ISSET(i,&socket_fd_set)){;
 				if( i == tcpsocketfd){
-					recv( udp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
-					printf("FAULT_TOLERANCE_MASTER: recieved message on udp: %c \n", recv_buffer[0]);
+					recv( tcpsocketfd, recv_buffer, sizeof(recv_buffer), 0);
+//					printf("FAULT_TOLERANCE_MASTER: recieved message on tcp: %s \n", recv_buffer);
 					if(recv_buffer[0] == 'i'){
 						for(int j = 0; j < N_ELEVATORS; j++){
 							if(elevator_alive_status[j] == -1){
 								elevator_alive_status[j] = 0;
-//								break;
+								break;
 							}
 						}
 					}
@@ -98,25 +98,25 @@ void * alivespam(void * ap){
 	char send_buffer[1024];
 	while(1){
 		send_buffer[0] = 'A';
+		send_buffer[1] = '\0';
 		send(udp_socketfd, send_buffer, sizeof(send_buffer), 0);
 		for( int i = 0; i < N_ELEVATORS; i++){
+//			printf("FAULT_TOLERANCE_MASTER: elevator_alive_status[i] = %d\n",elevator_alive_status[i]);
 			if(elevator_alive_status[i] != -1){
 				elevator_alive_status[i]++;
-				printf("%d\n",elevator_alive_status[i]);
+//				printf("%d\n",elevator_alive_status[i]);
 			}
 			if( elevator_alive_status[i] == 5){
 				exit(0);
 			}
-			send_buffer[0] = 'm';
-			send_buffer[1] = '\0';
-			char * temp = MY_IP;
-			usleep(1000000);
-			strcat(send_buffer, temp);
-			for(int j = 0; j<5; j++){
-				send(udp_socketfd, send_buffer, sizeof(send_buffer), 0);
-				printf("FAULT_TOLERANCE_MASTER: Sent %s \n", send_buffer);
-			}
 		}
+		send_buffer[0] = 'm';
+		send_buffer[1] = '\0';
+		char * temp = MY_IP;
+
+		strcat(send_buffer, temp);
+		send(udp_socketfd, send_buffer, sizeof(send_buffer), 0);
+//		printf("FAULT_TOLERANCE_MASTER: Sent %s \n", send_buffer);
 		usleep(100000);
 	}
 }

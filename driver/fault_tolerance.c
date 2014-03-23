@@ -22,12 +22,12 @@ void * backup_module(void * socketfd_void){
 	for(int i = 0; i <10; i++){
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 500000;
-		printf("FAULT_TOLERANCE: waiting on master \n");
+//		printf("FAULT_TOLERANCE: waiting on master \n");
 		FD_SET(udp_socketfd,&udp_fd_set);
 		select(udp_socketfd + 1, &udp_fd_set, NULL, NULL, &timeout);
 		if(FD_ISSET(udp_socketfd, &udp_fd_set)){
 			recv(udp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
-			printf("FAULT_TOLERANCE: recieved message: %s\n", recv_buffer);
+//			printf("FAULT_TOLERANCE: recieved message: %s\n", recv_buffer);
 			if(recv_buffer[0] == 'm'){
 				printf("FAULT_TOLERANCE: master found\n");
 				break;
@@ -45,22 +45,26 @@ void * backup_module(void * socketfd_void){
 	while(1){
 		FD_SET(udp_socketfd,&udp_fd_set);
 		timeout.tv_sec = 0;
-		timeout.tv_usec = 1000000;
-		select(2, &udp_fd_set, NULL, NULL, &timeout);
+		timeout.tv_usec = 100000;
+//		printf("FAULT_TOLERANCE: waiting on master \n");
+		select(udp_socketfd+1, &udp_fd_set, NULL, NULL, &timeout);
 		if(FD_ISSET(udp_socketfd, &udp_fd_set)){
 			recv(udp_socketfd, recv_buffer, sizeof(recv_buffer), 0);
-			if(recv_buffer[0] == 'A'){
+			if(recv_buffer[0] == 'm'){
 				send_buffer[0] = 'a';
 				send(tcpsocketfd, send_buffer, sizeof(send_buffer), 0);
 				number_of_misses = 0;
-				printf("FAULT_TOLERANCE: sent %s \n", send_buffer);
-			}
-			else{
-				number_of_misses++;
+//				printf("FAULT_TOLERANCE: sent %s \n", send_buffer);
 			}
 		}
+		else{
+				number_of_misses++;
+
+		}
+		
 		if(number_of_misses == 5){
 			printf("FAUOLT_TOLERANCE: Master is dead\n");
+			exit(0);
 		}
 	}
 }

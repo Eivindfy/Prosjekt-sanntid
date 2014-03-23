@@ -16,8 +16,8 @@
 #include <unistd.h>
 
 #define PORT 33546
-#define HOST "129.241.187.161"
-#define MY_IP "129.241.187.161"
+#define HOST "129.241.187.156"
+#define MY_IP "129.241.187.156"
 #define MY_PORT 20000
 #define NUMBER_OF_CONNECTIONS 10
 #define BUFFER_SIZE 1024
@@ -64,8 +64,10 @@ void* server_client_comunication(void* spvoid){
 						if(recv(extern_com, message, sizeof(message),0)<0){
 							printf("SERVERCLIENT: error recieving %s\n",strerror(errno));
 						}
-
-						if(send(intern_com, message, sizeof(message),0)<0){
+						else if(recv(extern_com, message, sizeof(message),0)==0){
+						
+						}
+						else if(send(intern_com, message, sizeof(message),0)<0){
 							printf("SERVERCLIENT: error sending %s\n",strerror(errno));
 						}
 					}
